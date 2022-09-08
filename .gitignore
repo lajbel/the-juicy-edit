@@ -1,4 +1,7 @@
-./build
+build
+dist
+learn
+node_modules
 .config
 .replit
 .replit.nix
