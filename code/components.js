@@ -12,12 +12,14 @@ export function downloader() {
         id: "downloader",
         requires: ["area"],
         add() {
-            this.onClick(() => {
-                var temp = onDraw(() => {
-                    download("juicy_person.png", screenshot());
-                    temp();
-                })
-            });
+            this.onClick(() => this.download());
+        },
+
+        download() {
+            let temp = onDraw(() => {
+                download("juicy_person.png", screenshot());
+                temp();
+            })
         }
     }
 }
@@ -32,7 +34,7 @@ export function checkbox(spr, spr2, icon, oncheck, onuncheck, extraT = "unuseful
 
             this.check = add([
                 sprite(spr2),
-                origin("center"),
+                anchor("center"),
                 z(100),
                 pos(spr2 === "correct" ? this.pos.add(6, -5) : this.pos.clone()),
                 "gui",
@@ -48,7 +50,7 @@ export function checkbox(spr, spr2, icon, oncheck, onuncheck, extraT = "unuseful
             if (icon) add([
                 sprite(icon),
                 pos(this.pos.add(40, 0)),
-                origin("center"),
+                anchor("center"),
                 "gui"
             ]);
 
@@ -81,59 +83,46 @@ export function checkbox(spr, spr2, icon, oncheck, onuncheck, extraT = "unuseful
     }
 }
 
-export function hoverOnce() {
-    let hoverStarted = false;
-    let hoverEnded = false;
-
-    return {
-        id: "hoverOnce",
-        require: ["area"],
-        update() {
-            if (this.isHovering()) {
-                if (hoverStarted) return;
-                hoverStarted = true;
-                hoverEnded = false;
-                this.trigger("hoverEnter");
-            }
-            else {
-                if (hoverEnded || !hoverStarted) return;
-                hoverEnded = true;
-                hoverStarted = false;
-                this.trigger("hoverExit");
-            }
-        },
-
-        onHoverOnce(onHover, onHoverExit) {
-            this.on("hoverEnter", onHover);
-
-            if (onHoverExit) this.on("hoverExit", onHoverExit)
-        },
-
-        onHoverEnter(action) {
-            return this.on("hoverEnter", action)
-        },
-
-        onHoverExit(action) {
-            return this.on("hoverExit", action)
-        }
-    }
-}
-
 export function tlsprite(spr, langs) {
     return {
         id: "tlsprite",
         require: ["sprite"],
+        lang: "n",
 
         add() {
             this.langs = langs;
         },
 
         changeLang(lang) {
-            this.use(sprite(`${"jp"}_${spr}`))
+            this.lang = lang;
+            this.use(sprite(`${lang}_${spr}`))
         }
     }
 }
 
-export function tltext() {
+export function tltext(texts) {
+    return {
+        id: "tltext",
+        require: ["text"],
+        lang: "n",
+        dfont: "n",
 
+        add() {
+            this.langs = new Map;
+            this.langs.set(this.lang, this.text)
+
+            this.dfont = this.font;
+            
+            texts.map((t) => {
+                this.langs.set(t.lang, t);
+            });
+        },
+
+        changeLang(lang) {
+            const l = this.langs.get(lang);
+            this.lang = lang;
+
+            this.use(text(l.text, { size: this.textSize, font: `${l.lang}_${this.dfont}` }));
+        }
+    }
 }

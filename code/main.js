@@ -1,41 +1,37 @@
 import kaboom from "kaboom";
-import { checkbox, downloader, hoverOnce } from "./components";
-import { easings, tween, tweentypes } from "./easing.js"
+import "kaboom/global";
+import { checkbox, downloader, tltext, tlsprite } from "./components";
 
-// initialize context
+// Start the Kaboom game
 export default kaboom({
-    width: 364,
+    width: 576,
     height: 324,
     letterbox: true,
     stretch: true,
     background: [141, 183, 255],
     touchToMouse: true,
     debug: true,
-    font: "juiceisntbelow",
+    font: "en_juiceisntbelow",
     canvas: document.querySelector("#myGame"),
 });
 
 // configuration & variables
-const hairCount = 35;
-const facesCount = 40;
-const outfitsCount = 35;
-const gameChars = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890Ññ,.?!+-=_:;/\\¿¡@#'&*<>[]{}()$%€~`|";
-const japChars = " ァアィイゥウェエォオ";
+const HAIR_COUNT = 35;
+const FACES_COUNT = 40;
+const OUTFITS_COUNT = 35;
+
+const EN_CHARS = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890Ññ,.?!+-=_:;/\\¿¡@#'&*<>[]{}()$%€~`|";
+const JP_CHARS = " 下遊日本人描飲売使アプクリシジユュスネッツエデイトャュョィあいなだはぶじゃりまんしてすでがとうございのをつっxび楽音";
 
 const bgs = [
     rgb(141, 183, 255),
-    rgb(131, 77, 196),
-    rgb(255, 107, 107),
-    rgb(181, 255, 141),
-    rgb(255, 158, 141),
-    rgb(189, 141, 255),
-    rgb(189, 141, 255),
+    rgb(57, 9, 71),
 ];
 
 const rooms = [
     camPos().clone(),
     camPos().clone().add(width(), 0),
-]
+];
 
 const layers = {
     belowbody: 1,
@@ -71,7 +67,9 @@ loadSprite("pointer", "./sprites/pointer.png");
 loadSprite("random", "./sprites/random.png");
 loadSprite("sorbet", "./sprites/sorbet.png");
 loadSprite("sorbet_icon", "./sprites/sorbet_icon.png");
-loadSprite("title", "./sprites/title.png");
+
+loadSprite("en_title", "./sprites/title.png");
+loadSprite("jp_title", "./sprites/jp_title.png");
 
 loadSprite("hair", "./sprites/hair.png", { sliceX: 10, sliceY: 7 });
 loadSprite("faces", "./sprites/faces.png", { sliceX: 7, sliceY: 6 });
@@ -79,9 +77,11 @@ loadSprite("outfits", "./sprites/outfits.png", { sliceX: 5, sliceY: 7 });
 
 loadSound("chillaxation", "./sounds/chillaxation.mp3");
 
-loadBitmapFont("juiceisntbelow", "./sprites/thejuiceisntbelow.png", 26, 37, { chars: gameChars });
+loadBitmapFont("juiceisntbelow", "./sprites/thejuiceisntbelow.png", 26, 37, { chars: EN_CHARS });
+loadBitmapFont("en_juiceisntbelow", "./sprites/thejuiceisntbelow.png", 26, 37, { chars: EN_CHARS });
+loadBitmapFont("jp_juiceisntbelow", "./sprites/ジュースは下じゃありません.png", 26, 37, { chars: JP_CHARS });
 
-// camera ///////////////////////////////////////////////////////////////////////
+// Camera Objects & Helper ////////////////////////////////////////////////////////////////////
 const camHelper = add([
     pos(camPos().sub(width(), 0)),
 ]);
@@ -89,15 +89,18 @@ const camHelper = add([
 camHelper.onUpdate(() => camPos(camHelper.pos));
 
 onClick("camera_changer", (ch) => {
-    tween(camHelper.pos, ["x"], 0.9, camHelper.pos.clone().x, ch.to.x, easings.easeOutBounce);
+    tween(camHelper.pos.x, ch.to.x, 0.9, (val) => camHelper.pos.x = val, easings.easeOutBounce)
 });
 
-// cursor ///////////////////////////////////////////////////////////////////////
+// Cursor ///////////////////////////////////////////////////////////////////////
+
+// Remove the default cursor setted by Kaboom
 onLoad(() => {
     const attr = document.getElementById("myGame").attributes.style.nodeValue;
     document.getElementById("myGame").setAttribute("style", attr.replace("default", "none;"));
 })
 
+// Check if the canvas are hovered
 const canvasIsHover = () => canvas.parentElement.querySelector(':hover') === canvas;
 
 const c = add([
@@ -125,11 +128,15 @@ onUpdate(() => {
     c.pos = mousePos();
 });
 
-// click to start ///////////////////////////////////////////////////////////////
+// Click to start ///////////////////////////////////////////////////////////////
 add([
-    text("click\n to\nstart"),
+    text("click\n to\nstart", { size: 36, font: "juiceisntbelow" }),
+    tltext([
+        { lang: "en", text: "click\n\ to\nstart" },
+        { lang: "jp", text: "クリックして\n遊びます" }
+    ]),
     color(74, 48, 82),
-    origin("center"),
+    anchor("center"),
     pos(center().sub(width(), 0)),
 ]);
 
@@ -141,14 +148,13 @@ const cts = add([
 ]);
 
 cts.onClick(() => {
+    tween(camHelper.pos.x, rooms[0].x, 0.9, (val) => camHelper.pos.x = val, easings.easeOutBounce)
     bgMusic = play("chillaxation", { volume: 0.05, loop: true });
-
-    tween(camHelper.pos, ["x"], 1, camHelper.pos.clone().x, 184, easings.easeOutBounce);
 
     cts.destroy();
 });
 
-/// bg //////////////////////////////////////////////////////////////////////////
+/// First UI and Scenario //////////////////////////////////////////////////////////////////////////
 const bg = add([
     pos(0, 0),
     rect(width(), height()),
@@ -158,24 +164,25 @@ const bg = add([
     },
 ]);
 
-add([
-    sprite("title"),
-    pos(center().x - 30, 20),
-    origin("center"),
+const title = add([
+    sprite("en_title"),
+    pos(center().x - 25, 30),
+    anchor("center"),
     z(50),
+    tlsprite("title", ["en", "jp"])
 ]);
 
-/// body ////////////////////////////////////////////////////////////////////////
+/// Body parts ////////////////////////////////////////////////////////////////////////
 const body = add([
     sprite("body"),
     pos(center().x, height()),
-    origin("bot"),
+    anchor("bot"),
     z(layers.body),
 ]);
 
 const hair = add([
     pos(body.pos.add(0, -193)),
-    origin("top"),
+    anchor("top"),
     z(layers.hair),
     "hair",
     {
@@ -185,14 +192,14 @@ const hair = add([
 
 add([
     pos(body.pos.add(0, -193)),
-    origin("top"),
+    anchor("top"),
     z(layers.fronthair),
     "fronthair",
 ]);
 
 const face = add([
     pos(center().x, height() - 86),
-    origin("bot"),
+    anchor("bot"),
     z(layers.face),
     "faces",
     {
@@ -202,7 +209,7 @@ const face = add([
 
 const outfit = add([
     pos(center().x, height()),
-    origin("bot"),
+    anchor("bot"),
     z(layers.outfit),
     "outfits",
     {
@@ -213,7 +220,7 @@ const outfit = add([
 const neko = add([
     pos(body.pos.add(0, -158)),
     sprite("neko"),
-    origin("center"),
+    anchor("center"),
     z(layers.belowbody),
     "extra",
 ]);
@@ -228,39 +235,39 @@ const sorbet = add([
 const flush = add([
     pos(body.pos.add(0, -118)),
     sprite("flush"),
-    origin("center"),
+    anchor("center"),
     z(layers.belowface),
     "extra",
 ]);
 
-every("extra", (obj) => obj.hidden = true);
+get("extra").forEach((obj) => obj.hidden = true);
 
 /// gui /////////////////////////////////////////////////////////////////////////
-add([
+const downloadButton = add([
     sprite("download"),
-    origin("center"),
+    color(74, 48, 82),
+    anchor("center"),
     pos(25, 146),
     z(50),
     area(),
-    hoverOnce(),
     downloader(),
     "bc",
 ]);
 
 add([
     pos(25, 196),
+    color(74, 48, 82),
     z(50),
     area(),
-    origin("center"),
-    hoverOnce(),
+    anchor("center"),
     checkbox("guicheck", "incorrect", "", hideGui, showGui, "nohide", "ahide"),
     "bc",
 ]);
 
 const changeBG = add([
     sprite("palette"),
-    origin("center"),
-    pos(306, 23),
+    anchor("center"),
+    pos(title.pos.add(160, 0)),
     z(50),
     area(),
     {
@@ -280,11 +287,11 @@ changeBG.onClick(() => {
 
 const random = add([
     sprite("random"),
-    origin("center"),
+    color(74, 48, 82),
+    anchor("center"),
     pos(25, 296),
     z(50),
     area(),
-    hoverOnce(),
     "bc",
 ]);
 
@@ -292,10 +299,10 @@ random.onClick(randomPart);
 
 add([
     pos(25, 246),
+    color(74, 48, 82),
     z(50),
     area(),
-    hoverOnce(),
-    origin("center"),
+    anchor("center"),
     checkbox("musiccheck", "incorrect", "",
         () => bgMusic.volume(0.0),
         () => bgMusic.volume(0.05),
@@ -316,9 +323,9 @@ addRightButton(body.pos.add(68, -28), "outfits");
 add([
     pos(center().x - 120 - 24.5, 80),
     z(50),
+    color(74, 48, 82),
     area(),
-    hoverOnce(),
-    origin("center"),
+    anchor("center"),
     checkbox("checkbox", "correct", "sorbet_icon",
         () => sorbet.hidden = false,
         () => sorbet.hidden = true
@@ -329,10 +336,10 @@ add([
 
 add([
     pos(center().x - 24.5, 80),
+    color(74, 48, 82),
     z(50),
     area(),
-    hoverOnce(),
-    origin("center"),
+    anchor("center"),
     checkbox("checkbox", "correct", "flush_icon",
         () => flush.hidden = false,
         () => flush.hidden = true
@@ -344,9 +351,9 @@ add([
 add([
     pos(center().x + 120 - 24.5, 80),
     z(50),
+    color(74, 48, 82),
     area(),
-    hoverOnce(),
-    origin("center"),
+    anchor("center"),
     checkbox("checkbox", "correct", "neko_icon",
         () => neko.hidden = false,
         () => neko.hidden = true
@@ -355,18 +362,18 @@ add([
     "bc",
 ]);
 
-// buttons things
-onClick("left", (b) => btn(b, true));
-onClick("right", (b) => btn(b, false));
-
 // about screen
 const about = add([
     pos(width() + 6, 0),
 ]);
 
-about.add([
-    text("the juicy edit", { size: 22 }),
-    pos(4, 10),
+add([
+    text("the juicy edit", { size: 22, font: "juiceisntbelow" }),
+    tltext([
+        { lang: "en", text: "the juicy edit" },
+        { lang: "jp", text: "ジュxスディト" }
+    ]),
+    pos(about.pos.add(4, 10)),
     color(74, 48, 82),
 ]);
 
@@ -376,9 +383,13 @@ about.add([
     color(74, 48, 82),
 ]);
 
-about.add([
-    text("Music", { size: 18 }),
-    pos(4, 54),
+add([
+    text("Music", { size: 18, font: "juiceisntbelow" }),
+    tltext([
+        { lang: "en", text: "Music" },
+        { lang: "jp", text: "楽音" },
+    ]),
+    pos(about.pos.add(4, 54)),
     color(74, 48, 82),
 ]);
 
@@ -412,14 +423,6 @@ about.add([
     color(74, 48, 82),
 ]);
 
-
-about.add([
-    text("you are free to use you creations\nas you want\nthanks for play", { size: 12 }),
-    pos(center().x, height() - 40),
-    origin("center"),
-    color(74, 48, 82),
-]);
-
 about.add([
     sprite("catwithhotdog"),
     pos(230, 10),
@@ -427,10 +430,10 @@ about.add([
 
 add([
     sprite("about"),
-    origin("botright"),
+    anchor("botright"),
+    color(74, 48, 82),
     pos(width() - 3, height() - 3),
     area(),
-    hoverOnce(),
     "camera_changer",
     "bc",
     "gui",
@@ -441,10 +444,10 @@ add([
 
 add([
     sprite("arrow"),
-    origin("botleft"),
+    anchor("botleft"),
+    color(74, 48, 82),
     pos(width() + 3, height() - 5),
     area(),
-    hoverOnce(),
     "camera_changer",
     "bc",
     "gui",
@@ -453,18 +456,83 @@ add([
     }
 ]);
 
-every("bc", (o) => {
-    o.color = rgb(74, 48, 82);
+const changeJp = add([
+    text("jp"),
+    color(74, 48, 82),
+    pos(about.pos.add(width() - 10, height() - 10)),
+    area(),
+    anchor("botright"),
+    "bc",
+]);
 
-    o.onHoverOnce(() => {
-        o.color = rgb(31, 16, 42);
-    }, () => {
-        o.color = rgb(74, 48, 82);
+const changeEn = add([
+    text("en"),
+    pos(changeJp.pos.sub(60, 0)),
+    color(74, 48, 82),
+    area(),
+    anchor("botright"),
+    "bc",
+]);
+
+changeEn.onClick(() => {
+    get("tltext").forEach((t) => {
+        if (t.lang == "en") return;
+
+        t.changeLang("en");
     });
+
+    get("tlsprite").forEach((t) => {
+        if (t.lang == "en") return;
+
+        t.changeLang("en");
+    });
+});
+
+changeJp.onClick(() => {
+    get("tltext").forEach((t) => {
+        if (t.lang == "jp") return;
+
+        t.changeLang("jp");
+    });
+
+    get("tlsprite").forEach((t) => {
+        if (t.lang == "jp") return;
+
+        t.changeLang("jp");
+    });
+});
+
+/// Some events
+onHover("bc", (o) => {
+    o.color = rgb(31, 16, 42);
+});
+
+onHoverEnd("bc", (o) => {
+    o.color = rgb(74, 48, 82);
+});
+
+onHover("btn", (btn) => {
+    btn.color = rgb(135, 62, 132);
+});
+
+onHoverEnd("btn", (btn) => {
+    btn.color = rgb(212, 110, 179);
+});
+
+onClick("left", (b) => {
+    btn(b, true);
+});
+
+onClick("right", (b) => {
+    btn(b, false);
 });
 
 // keys /////////////////////////////////////////////////////////////////////////
 onKeyPressRepeat("r", randomPart);
+
+onKeyPress("s", () => {
+    downloadButton.download();
+});
 
 /// functions ////////////////////////
 function addLeftButton(pos, toChange) {
@@ -476,46 +544,38 @@ function addRightButton(pos, toChange) {
 }
 
 function addButton(number, w, thing, side) {
-    const btn = add([
+    add([
         sprite("button", { flipX: number }),
+        color(212, 110, 179),
         pos(w),
-        origin("center"),
+        anchor("center"),
         area(),
         z(10),
-        hoverOnce(),
         "btn",
         "gui",
         thing,
         side,
     ]);
-
-    btn.color = rgb(212, 110, 179);
-
-    btn.onHoverOnce(() => {
-        btn.color = rgb(135, 62, 132);
-    }, () => {
-        btn.color = rgb(212, 110, 179);
-    });
 }
 
 function randomPart() {
-    hair.cur = Math.round((Math.random() * (hairCount - 0) + 0) / 2) * 2;
-    face.cur = randi(facesCount);
-    outfit.cur = randi(outfitsCount);
+    hair.cur = Math.round((Math.random() * (HAIR_COUNT - 0) + 0) / 2) * 2;
+    face.cur = randi(FACES_COUNT);
+    outfit.cur = randi(OUTFITS_COUNT);
 
-    setPart2(hairCount, "hair", "fronthair", true, false);
-    setPart(facesCount, "faces", true, false);
-    setPart(outfitsCount, "outfits", true, false);
+    setPart2(HAIR_COUNT, "hair", "fronthair", true, false);
+    setPart(FACES_COUNT, "faces", true, false);
+    setPart(OUTFITS_COUNT, "outfits", true, false);
 }
 
 function hideGui() {
-    every("gui", (g) => {
+    get("gui").forEach((g) => {
         if (!g.is("nohide")) g.hidden = true;
     });
 }
 
 function showGui() {
-    every("gui", (g) => {
+    get("gui").forEach((g) => {
         if (g.is("ahide")) {
             g.hidden = true;
         }
@@ -568,19 +628,19 @@ function setPart2(count, tag, tag2, sub, set = true) {
 }
 
 function btn(b, s) {
-    if (b.is("hair")) setPart2(hairCount, "hair", "fronthair", s);
-    else if (b.is("faces")) setPart(facesCount, "faces", s);
-    else if (b.is("outfits")) setPart(outfitsCount, "outfits", s)
+    if (b.is("hair")) setPart2(HAIR_COUNT, "hair", "fronthair", s);
+    else if (b.is("faces")) setPart(FACES_COUNT, "faces", s);
+    else if (b.is("outfits")) setPart(OUTFITS_COUNT, "outfits", s)
 }
 
-every((o) => {
+getAll().forEach((o) => {
     if (!o.is("area")) return;
 
-    o.on("hoverEnter", () => {
+    o.onHover(() => {
         c.use(sprite("pointer"));
     });
 
-    o.on("hoverExit", () => {
+    o.onHoverEnd(() => {
         c.use(sprite("default"));
     });
 });

@@ -74,14 +74,14 @@ function buildGame() {
     fs.copy("./sprites", "./build/sprites");
     fs.copy("./dist", "./build/dist");
     fs.copy("./sounds", "./build/sounds");
-    fs.move("./dist/index.html", "./build/index.html", { overwrite: true });
+    // fs.move("./dist/index.html", "./build/index.html", { overwrite: true });
 
     var zip = new AdmZip();
 
     zip.addLocalFile("./build/dist/game.js", "./dist");
     zip.addLocalFile("./build/dist/helper.js", "./dist");
-    zip.addLocalFolder("./build/sprites/", "/sprites");
-    zip.addLocalFolder("./build/sounds/", "/sounds");
+    zip.addLocalFolder("./build/sprites/", "./sprites");
+    zip.addLocalFolder("./build/sounds/", "./sounds");
     zip.addLocalFile("./build/index.html");
 
     zip.writeZip("./game.zip");
