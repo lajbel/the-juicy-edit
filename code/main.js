@@ -399,9 +399,13 @@ about.add([
     color(74, 48, 82),
 ]);
 
-about.add([
-    text("Publishing", { size: 18 }),
-    pos(4, 96),
+add([
+    text("Publishing", { size: 18, font: "juiceisntbelow" }),
+    tltext([
+        { lang: "en", text: "Publishing" },
+        { lang: "jp", text: "出版社" }
+    ]),
+    pos(about.pos.add(4, 96)),
     color(74, 48, 82),
 ]);
 

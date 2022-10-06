@@ -18,11 +18,9 @@ function buildGame() {
     const template = fs.readFileSync("template.html", "utf-8");
     let code = "";
 
-    code += `<script src="./dist/helper.js"></script>\n`;
     code += `<script src="./dist/game.js"></script>\n`;
 
     try {
-
         // build user code
         esbuild.buildSync({
             bundle: true,
@@ -33,16 +31,6 @@ function buildGame() {
             entryPoints: ["code/main.js"],
             outfile: "dist/game.js",
         });
-
-        esbuild.buildSync({
-            bundle: true,
-            sourcemap: true,
-            target: "es6",
-            keepNames: true,
-            entryPoints: ["helper.ts"],
-            outfile: "dist/helper.js",
-        });
-
     } catch (e) {
         const loc = e.errors[0].location;
         err = {
