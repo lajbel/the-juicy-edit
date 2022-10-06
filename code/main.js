@@ -10,7 +10,7 @@ export default kaboom({
     stretch: true,
     background: [141, 183, 255],
     touchToMouse: true,
-    debug: true,
+    debug: false,
     font: "en_juiceisntbelow",
     canvas: document.querySelector("#myGame"),
 });
@@ -434,9 +434,9 @@ about.add([
 
 add([
     sprite("about"),
-    anchor("botright"),
+    anchor("topright"),
     color(74, 48, 82),
-    pos(width() - 3, height() - 3),
+    pos(width() - 3, 3),
     area(),
     "camera_changer",
     "bc",
