@@ -438,9 +438,9 @@ about.add([
 
 add([
     sprite("about"),
-    anchor("botright"),
+    anchor("topright"),
     color(74, 48, 82),
-    pos(width() - 3, height() - 3),
+    pos(width() - 3, 3),
     area(),
     "camera_changer",
     "bc",
