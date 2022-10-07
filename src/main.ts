@@ -12,13 +12,13 @@ kaboom({
     touchToMouse: true,
     debug: true,
     font: "en_juiceisntbelow",
-    canvas: document.querySelector("#myGame"),
+    canvas: document.querySelector("#myGame") as HTMLCanvasElement,
 });
 
 // configuration & variables
-const HAIR_COUNT = 35;
-const FACES_COUNT = 40;
-const OUTFITS_COUNT = 35;
+let OUTFITS_COUNT = 0;
+let HAIR_COUNT = 0;
+let FACES_COUNT = 0;
 
 const EN_CHARS = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890Ññ,.?!+-=_:;/\\¿¡@#'&*<>[]{}()$%€~`|";
 const JP_CHARS = " 下遊日本人描飲売使アプクリシジユュスネッツエデイトャュョィあいなだはぶじゃりまんしてすでがとうございのをつっxび楽音出版社";
@@ -71,9 +71,9 @@ loadSprite("sorbet_icon", "/sprites/sorbet_icon.png");
 loadSprite("en_title", "/sprites/title.png");
 loadSprite("jp_title", "/sprites/jp_title.png");
 
-loadSprite("hair", "/sprites/hair.png", { sliceX: 10, sliceY: 7 });
-loadSprite("faces", "/sprites/faces.png", { sliceX: 7, sliceY: 6 });
-loadSprite("outfits", "/sprites/outfits.png", { sliceX: 5, sliceY: 7 });
+loadAseprite("hair", "/sprites/hair.png", "/sprites/hair.json").onLoad(d => { HAIR_COUNT = d.frames.length / 2 });
+loadAseprite("faces", "/sprites/faces.png", "/sprites/faces.json").onLoad(d => { FACES_COUNT = d.frames.length });
+loadAseprite("outfits", "/sprites/outfits.png", "/sprites/outfits.json").onLoad(d => { OUTFITS_COUNT = d.frames.length; });
 
 loadSound("chillaxation", "/sounds/chillaxation.mp3");
 
@@ -96,12 +96,13 @@ onClick("camera_changer", (ch) => {
 
 // Remove the default cursor setted by Kaboom
 onLoad(() => {
-    const attr = document.getElementById("myGame").attributes.style.nodeValue;
-    document.getElementById("myGame").setAttribute("style", attr.replace("default", "none;"));
+    // @ts-ignore
+    const attr = document.getElementById("myGame")?.attributes.style.nodeValue;
+    document.getElementById("myGame")?.setAttribute("style", attr.replace("default", "none;"));
 })
 
 // Check if the canvas are hovered
-const canvasIsHover = () => canvas.parentElement.querySelector(':hover') === canvas;
+const canvasIsHover = () => canvas.parentElement?.querySelector(':hover') === canvas;
 
 const c = add([
     sprite("default"),
@@ -260,7 +261,7 @@ add([
     z(50),
     area(),
     anchor("center"),
-    checkbox("guicheck", "incorrect", "", hideGui, showGui, "nohide", "ahide"),
+    checkbox("guicheck", "incorrect", "", hideGui, showGui, "nohide"),
     "bc",
 ]);
 
@@ -464,51 +465,51 @@ add([
     }
 ]);
 
-const changeJp = add([
-    text("jp"),
-    color(74, 48, 82),
-    pos(about.pos.add(width() - 10, height() - 10)),
-    area(),
-    anchor("botright"),
-    "bc",
-]);
+// const changeJp = add([
+//     text("jp"),
+//     color(74, 48, 82),
+//     pos(about.pos.add(width() - 10, height() - 10)),
+//     area(),
+//     anchor("botright"),
+//     "bc",
+// ]);
 
-const changeEn = add([
-    text("en"),
-    pos(changeJp.pos.sub(60, 0)),
-    color(74, 48, 82),
-    area(),
-    anchor("botright"),
-    "bc",
-]);
+// const changeEn = add([
+//     text("en"),
+//     pos(changeJp.pos.sub(60, 0)),
+//     color(74, 48, 82),
+//     area(),
+//     anchor("botright"),
+//     "bc",
+// ]);
 
-changeEn.onClick(() => {
-    get("tltext").forEach((t) => {
-        if (t.lang == "en") return;
+// changeEn.onClick(() => {
+//     get("tltext").forEach((t) => {
+//         if (t.lang == "en") return;
 
-        t.changeLang("en");
-    });
+//         t.changeLang("en");
+//     });
 
-    get("tlsprite").forEach((t) => {
-        if (t.lang == "en") return;
+//     get("tlsprite").forEach((t) => {
+//         if (t.lang == "en") return;
 
-        t.changeLang("en");
-    });
-});
+//         t.changeLang("en");
+//     });
+// });
 
-changeJp.onClick(() => {
-    get("tltext").forEach((t) => {
-        if (t.lang == "jp") return;
+// changeJp.onClick(() => {
+//     get("tltext").forEach((t) => {
+//         if (t.lang == "jp") return;
 
-        t.changeLang("jp");
-    });
+//         t.changeLang("jp");
+//     });
 
-    get("tlsprite").forEach((t) => {
-        if (t.lang == "jp") return;
+//     get("tlsprite").forEach((t) => {
+//         if (t.lang == "jp") return;
 
-        t.changeLang("jp");
-    });
-});
+//         t.changeLang("jp");
+//     });
+// });
 
 /// Some events
 onHover("bc", (o) => {

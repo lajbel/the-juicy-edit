@@ -1,9 +1,9 @@
 {
 	"name": "the-juicy-edit",
 	"scripts": {
-		"watch": "esbuild --bundle src/main.js --outfile=www/main.js --watch",
-		"build": "esbuild --bundle src/main.js --outfile=www/main.js",
-		"dev": "esbuild --bundle src/main.js --outfile=www/main.js --servedir=www",
+		"watch": "esbuild --bundle src/main.ts --outfile=www/main.js --watch",
+		"build": "esbuild --bundle src/main.ts --outfile=www/main.js",
+		"dev": "esbuild --bundle src/main.ts --outfile=www/main.js --servedir=www",
 		"zip": "npm run build && mkdir -p dist && zip -r dist/game.zip www -x \"**/.DS_Store\"",
 		"run:desktop": "npm run build && neu run",
 		"build:desktop": "npm run build && neu build --release"
