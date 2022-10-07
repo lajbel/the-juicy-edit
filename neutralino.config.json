@@ -1,0 +1,28 @@
+{
+	"applicationId": "com.kaboomjs.thejuicyedit",
+	"version": "1.0.0",
+	"defaultMode": "window",
+	"documentRoot": "/www/",
+	"url": "/",
+	"enableServer": true,
+	"enableNativeAPI": true,
+	"modes": {
+		"window": {
+			"title": "The Juicy Edit :D",
+			"icon": "/www/sprites/palette.png",
+			"width": 1089,
+			"height": 648,
+			"resizable": true,
+			"minWidth": 1089,
+			"minHeight": 648
+		}
+	},
+	"cli": {
+		"binaryName": "the-juicy-edit",
+		"resourcesPath": "/www/",
+		"extensionsPath": "/extensions/",
+		"clientLibrary": "/bin/neutralino.js",
+		"binaryVersion": "4.7.0",
+		"clientVersion": "3.6.0"
+	}
+}

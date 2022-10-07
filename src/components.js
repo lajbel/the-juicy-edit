@@ -1,4 +1,4 @@
-import _k from "./main";
+import "kaboom/global";
 
 export function download(filename, url) {
     const a = document.createElement("a");

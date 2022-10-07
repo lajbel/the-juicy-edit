@@ -1,9 +1,6 @@
-build
-dist
-learn
+www/main.js
+dist/
+bin/
 node_modules
-.config
-.replit
-.replit.nix
-game.zip
-helper.ts
+neutralinojs.log
+.tmp/
