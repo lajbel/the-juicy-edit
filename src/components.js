@@ -1,29 +1,5 @@
 import "kaboom/global";
 
-export function download(filename, url) {
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click();
-}
-
-export function downloader() {
-    return {
-        id: "downloader",
-        requires: ["area"],
-        add() {
-            this.onClick(() => this.download());
-        },
-
-        download() {
-            let temp = onDraw(() => {
-                download("juicy_person.png", screenshot());
-                temp();
-            })
-        }
-    }
-}
-
 export function checkbox(spr, spr2, icon, oncheck, onuncheck, extraT = "unuseful") {
     return {
         id: "checkbox",

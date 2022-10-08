@@ -1,6 +1,6 @@
 import kaboom from "kaboom";
 import "kaboom/global";
-import { checkbox, downloader, tltext, tlsprite } from "./components";
+import { checkbox, tltext, tlsprite } from "./components";
 
 // Start the Kaboom game
 kaboom({
@@ -26,6 +26,8 @@ const JP_CHARS = " 下遊日本人描飲売使アプクリシジユュスネッ�
 const bgs = [
     rgb(141, 183, 255),
     rgb(57, 9, 71),
+    Color.fromHex("ffb879"),
+    Color.fromHex("834dc4"),
 ];
 
 const rooms = [
@@ -46,40 +48,40 @@ const layers = {
 let bgMusic;
 
 // load assets //////////////////////////////////////////////////////////////////
-loadSprite("about", "/sprites/about.png");
-loadSprite("arrow", "/sprites/arrow.png");
-loadSprite("body", "/sprites/body.png");
-loadSprite("button", "/sprites/button.png");
-loadSprite("catwithhotdog", "/sprites/catwithhotdog.png");
-loadSprite("checkbox", "/sprites/checkbox.png");
-loadSprite("correct", "/sprites/correct.png");
-loadSprite("default", "/sprites/default.png");
-loadSprite("download", "/sprites/download.png");
-loadSprite("flush", "/sprites/flush.png");
-loadSprite("flush_icon", "/sprites/flush_icon.png");
-loadSprite("guicheck", "/sprites/guicheck.png");
-loadSprite("incorrect", "/sprites/incorrect.png");
-loadSprite("musiccheck", "/sprites/musiccheck.png");
-loadSprite("neko", "/sprites/neko.png");
-loadSprite("neko_icon", "/sprites/neko_icon.png");
-loadSprite("palette", "/sprites/palette.png");
-loadSprite("pointer", "/sprites/pointer.png");
-loadSprite("random", "/sprites/random.png");
-loadSprite("sorbet", "/sprites/sorbet.png");
-loadSprite("sorbet_icon", "/sprites/sorbet_icon.png");
+loadSprite("about", "./sprites/about.png");
+loadSprite("arrow", "./sprites/arrow.png");
+loadSprite("body", "./sprites/body.png");
+loadSprite("button", "./sprites/button.png");
+loadSprite("catwithhotdog", "./sprites/catwithhotdog.png");
+loadSprite("checkbox", "./sprites/checkbox.png");
+loadSprite("correct", "./sprites/correct.png");
+loadSprite("default", "./sprites/default.png");
+loadSprite("download", "./sprites/download.png");
+loadSprite("flush", "./sprites/flush.png");
+loadSprite("flush_icon", "./sprites/flush_icon.png");
+loadSprite("guicheck", "./sprites/guicheck.png");
+loadSprite("incorrect", "./sprites/incorrect.png");
+loadSprite("musiccheck", "./sprites/musiccheck.png");
+loadSprite("neko", "./sprites/neko.png");
+loadSprite("neko_icon", "./sprites/neko_icon.png");
+loadSprite("palette", "./sprites/palette.png");
+loadSprite("pointer", "./sprites/pointer.png");
+loadSprite("random", "./sprites/random.png");
+loadSprite("sorbet", "./sprites/sorbet.png");
+loadSprite("sorbet_icon", "./sprites/sorbet_icon.png");
 
-loadSprite("en_title", "/sprites/title.png");
-loadSprite("jp_title", "/sprites/jp_title.png");
+loadSprite("en_title", "./sprites/title.png");
+loadSprite("jp_title", "./sprites/jp_title.png");
 
-loadAseprite("hair", "/sprites/hair.png", "/sprites/hair.json").onLoad(d => { HAIR_COUNT = d.frames.length / 2 });
-loadAseprite("faces", "/sprites/faces.png", "/sprites/faces.json").onLoad(d => { FACES_COUNT = d.frames.length });
-loadAseprite("outfits", "/sprites/outfits.png", "/sprites/outfits.json").onLoad(d => { OUTFITS_COUNT = d.frames.length; });
+loadAseprite("hair", "./sprites/hair.png", "./sprites/hair.json").onLoad(d => { HAIR_COUNT = d.frames.length / 2 });
+loadAseprite("faces", "./sprites/faces.png", "./sprites/faces.json").onLoad(d => { FACES_COUNT = d.frames.length });
+loadAseprite("outfits", "./sprites/outfits.png", "./sprites/outfits.json").onLoad(d => { OUTFITS_COUNT = d.frames.length; });
 
-loadSound("chillaxation", "/sounds/chillaxation.mp3");
+loadSound("chillaxation", "./sounds/chillaxation.mp3");
 
-loadBitmapFont("juiceisntbelow", "/sprites/thejuiceisntbelow.png", 26, 37, { chars: EN_CHARS });
-loadBitmapFont("en_juiceisntbelow", "/sprites/thejuiceisntbelow.png", 26, 37, { chars: EN_CHARS });
-loadBitmapFont("jp_juiceisntbelow", "/sprites/thejuiceisntbelow_jp.png", 26, 37, { chars: JP_CHARS });
+loadBitmapFont("juiceisntbelow", "./sprites/thejuiceisntbelow.png", 26, 37, { chars: EN_CHARS });
+loadBitmapFont("en_juiceisntbelow", "./sprites/thejuiceisntbelow.png", 26, 37, { chars: EN_CHARS });
+loadBitmapFont("jp_juiceisntbelow", "./sprites/thejuiceisntbelow_jp.png", 26, 37, { chars: JP_CHARS });
 
 // Camera Objects & Helper ////////////////////////////////////////////////////////////////////
 const camHelper = add([
@@ -244,19 +246,8 @@ const flush = add([
 get("extra").forEach((obj) => obj.hidden = true);
 
 /// gui /////////////////////////////////////////////////////////////////////////
-const downloadButton = add([
-    sprite("download"),
-    color(74, 48, 82),
-    anchor("center"),
-    pos(25, 146),
-    z(50),
-    area(),
-    downloader(),
-    "bc",
-]);
-
 add([
-    pos(25, 196),
+    pos(25, 156),
     color(74, 48, 82),
     z(50),
     area(),
@@ -290,7 +281,7 @@ const random = add([
     sprite("random"),
     color(74, 48, 82),
     anchor("center"),
-    pos(25, 296),
+    pos(25, 256),
     z(50),
     area(),
     "bc",
@@ -299,7 +290,7 @@ const random = add([
 random.onClick(randomPart);
 
 add([
-    pos(25, 246),
+    pos(25, 206),
     color(74, 48, 82),
     z(50),
     area(),
@@ -538,10 +529,6 @@ onClick("right", (b) => {
 
 // keys /////////////////////////////////////////////////////////////////////////
 onKeyPressRepeat("r", randomPart);
-
-onKeyPress("s", () => {
-    downloadButton.download();
-});
 
 /// functions ////////////////////////
 function addLeftButton(pos, toChange) {
