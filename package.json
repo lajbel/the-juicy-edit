@@ -1,15 +1,24 @@
 {
-	"name": "kaboom-env",
-	"dependencies": {
-		"@replit/database": "^2.0.1",
-		"@types/copyfiles": "^2.4.1",
-		"adm-zip": "^0.5.9",
-		"copyfiles": "^2.4.1",
-		"esbuild": "^0.15.10",
-		"express": "^4.17.1",
-		"fs-extra": "^10.1.0",
-		"kaboom": "^3000.0.0-alpha.20",
-		"stacktrace-js": "^2.0.2",
-		"ws": "^8.2.0"
-	}
+    "name": "tje",
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite",
+        "preview": "vite preview",
+        "zip": "pnpm run build && mkdir -p dist && zip -r dist/game.zip www -x \"**/.DS_Store\"",
+        "check": "tsc",
+        "dev:desktop": "tauri dev",
+        "build:desktop": "tauri build"
+    },
+    "dependencies": {
+        "dprint": "^0.47.2",
+        "kaplay": "github:kaplayjs/kaplay"
+    },
+    "devDependencies": {
+        "@kaplayjs/dprint-config": "^1.0.0",
+        "@tauri-apps/cli": "^1.6.0",
+        "typescript": "^5.5.4",
+        "vite": "^5.3.5"
+    },
+    "packageManager": "pnpm@9.5.0+sha512.140036830124618d624a2187b50d04289d5a087f326c9edfc0ccd733d76c4f52c3a313d4fc148794a2a9d81553016004e6742e8cf850670268a7387fc220c903"
 }

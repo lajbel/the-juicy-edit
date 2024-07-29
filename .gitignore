@@ -1,9 +1,4 @@
-build
-dist
-learn
-node_modules
-.config
-.replit
-.replit.nix
-game.zip
-helper.ts
+node_modules/
+www/main.js
+dist/
+src-tauri/target/

@@ -308,8 +308,8 @@ add([
     area(),
     anchor("center"),
     checkbox("musiccheck", "incorrect", "",
-        () => bgMusic.volume(0.0),
-        () => bgMusic.volume(0.05),
+        () => bgMusic.volume = 0.0,
+        () => bgMusic.volume = 0.05,
         "nohide",
     ),
     "bc",
@@ -641,7 +641,7 @@ function btn(b, s) {
     else if (b.is("outfits")) setPart(OUTFITS_COUNT, "outfits", s)
 }
 
-getAll().forEach((o) => {
+get("*", { recursive: true }).forEach((o) => {
     if (!o.is("area")) return;
 
     o.onHover(() => {
