@@ -3,7 +3,7 @@ import { k } from "./engine";
 
 k.loadSprite("about", "./sprites/about.png");
 k.loadSprite("arrow", "./sprites/arrow.png");
-k.loadSprite("body", "./sprites/body.png");
+k.loadSprite("human", "./sprites/human.png");
 k.loadSprite("button", "./sprites/button.png");
 k.loadSprite("catwithhotdog", "./sprites/catwithhotdog.png");
 k.loadSprite("checkbox", "./sprites/checkbox.png");

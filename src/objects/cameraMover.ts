@@ -1,4 +1,3 @@
-import { SCREEN_W } from "../config";
 import { k } from "../engine";
 
 export const makeCameraMover = () => {
@@ -16,12 +15,12 @@ export const makeCameraMover = () => {
     const moveCamByBox = (boxNumber: number) => {
         camera.tween(
             camera.pos,
-            k.vec2(SCREEN_W * (boxNumber + 1), camera.pos.y),
+            k.vec2(k.width() * (boxNumber + 1), camera.pos.y),
             1,
             (v) => {
                 camera.pos = v;
             },
-            k.easings.linear,
+            k.easings.easeOutBounce,
         );
     };
 
