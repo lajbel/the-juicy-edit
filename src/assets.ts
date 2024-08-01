@@ -1,4 +1,4 @@
-import { EN_CHARS, JP_CHARS } from "./config";
+import { EN_CHARS, faceItems, JP_CHARS } from "./config";
 import { k } from "./engine";
 
 k.loadSprite("about", "./sprites/about.png");
@@ -23,11 +23,22 @@ k.loadSprite("random", "./sprites/random.png");
 k.loadSprite("sorbet", "./sprites/sorbet.png");
 k.loadSprite("sorbet_icon", "./sprites/sorbet_icon.png");
 
+k.loadAseprite(
+    "ui_pack",
+    "./sprites/ui/ui_pack.png",
+    "./sprites/ui/ui_pack.json",
+);
+
+const faces = k.loadAseprite(
+    "faces",
+    "./sprites/faces.png",
+    "./sprites/faces.json",
+);
+
 k.loadSprite("en_title", "./sprites/title.png");
 k.loadSprite("jp_title", "./sprites/jp_title.png");
 
 k.loadSprite("hair", "./sprites/hair.png", { sliceX: 10, sliceY: 7 });
-k.loadSprite("faces", "./sprites/faces.png", { sliceX: 7, sliceY: 6 });
 k.loadSprite("outfits", "./sprites/outfits.png", { sliceX: 5, sliceY: 7 });
 
 k.loadSound("chillaxation", "./sounds/chillaxation.mp3");
@@ -52,3 +63,12 @@ k.loadBitmapFont(
     37,
     { chars: JP_CHARS },
 );
+
+faces.onLoad((data) => {
+    data.frames.forEach((q, i) => {
+        faceItems.push({
+            id: i,
+            unlocked: true,
+        });
+    });
+});

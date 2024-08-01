@@ -1,6 +1,13 @@
+type Item = {
+    id: number;
+    unlocked: boolean;
+};
+
 export const HAIRSTYLES_COUNT = 35;
 export const FACES_COUNT = 40;
 export const OUTFITS_COUNT = 35;
+
+export const faceItems: Item[] = [];
 
 export const EN_CHARS =
     " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890Ññ,.?!+-=_:;/\\¿¡@#'&*<>[]{}()$%€~`|";
