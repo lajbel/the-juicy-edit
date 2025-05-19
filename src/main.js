@@ -1,3 +1,5 @@
+// @ts-check
+
 import kaboom from "kaplay";
 import "kaplay/global";
 import { checkbox, downloader, tltext, tlsprite } from "./components";
@@ -6,10 +8,9 @@ import { checkbox, downloader, tltext, tlsprite } from "./components";
 export default kaboom({
     width: 576,
     height: 324,
+    scale: 2,
     letterbox: true,
-    stretch: true,
     background: [141, 183, 255],
-    touchToMouse: true,
     debug: true,
     font: "en_juiceisntbelow",
 });
@@ -46,6 +47,7 @@ const layers = {
     fronthair: 7,
 }
 
+/** @type { import("kaplay").AudioPlay } */
 let bgMusic;
 
 // load assets //////////////////////////////////////////////////////////////////
@@ -108,19 +110,6 @@ const c = add([
 ]);
 
 c.hidden = true;
-
-onUpdate(() => {
-    const canvasIsHovered = canvasIsHover();
-
-    if (canvasIsHovered !== c.h) {
-        if (canvasIsHovered === true) c.hidden = false;
-        else c.hidden = true;
-
-        c.h = canvasIsHover();
-    }
-
-    c.pos = mousePos();
-});
 
 // Click to start ///////////////////////////////////////////////////////////////
 add([
@@ -298,8 +287,8 @@ add([
     area(),
     anchor("center"),
     checkbox("musiccheck", "incorrect", "",
-        () => bgMusic.volume(0.0),
-        () => bgMusic.volume(0.05),
+        () => bgMusic.volume = 0,
+        () => bgMusic.volume = 0.05,
         "nohide",
     ),
     "bc",
@@ -631,7 +620,7 @@ function btn(b, s) {
     else if (b.is("outfits")) setPart(OUTFITS_COUNT, "outfits", s)
 }
 
-getAll().forEach((o) => {
+get("*").forEach((o) => {
     if (!o.is("area")) return;
 
     o.onHover(() => {
