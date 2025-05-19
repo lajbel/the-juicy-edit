@@ -3,15 +3,21 @@
 import kaplay from "kaplay";
 import "kaplay/global";
 import { checkbox, downloader, tltext, tlsprite } from "./components";
+import { dynamicPos, dynamicVec2, setVec2, updatePos, updateVec2 } from "./dynamic";
+import { addSpriteCheckbox } from "./objects/addSpriteCheckbox";
 
-export default kaplay({
-    width: 576,
-    height: 324,
+/**
+ * @typedef {import("kaplay").Vec2} Vec2
+ */
+
+export const k = kaplay({
     scale: 2,
-    letterbox: true,
     background: [141, 183, 255],
     debug: true,
-    font: "en_juiceisntbelow",
+    font: "happy",
+    crisp: true,
+    maxFPS: 120,
+    texFilter: "nearest",
 });
 
 // configuration & variables
@@ -22,8 +28,9 @@ const OUTFITS_COUNT = 35;
 const EN_CHARS = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890Ññ,.?!+-=_:;/\\¿¡@#'&*<>[]{}()$%€~`|";
 
 const bgs = [
-    rgb(141, 183, 255),
-    rgb(57, 9, 71),
+    Color.fromHex("#8db7ff"),
+    Color.fromHex("#ffc3f2"),
+    Color.fromHex("#c97373"),
 ];
 
 const rooms = [
@@ -78,16 +85,7 @@ loadSound("chillaxation", "./sounds/chillaxation.mp3");
 loadBitmapFont("juiceisntbelow", "./sprites/thejuiceisntbelow.png", 26, 37, { chars: EN_CHARS });
 loadBitmapFont("en_juiceisntbelow", "./sprites/thejuiceisntbelow.png", 26, 37, { chars: EN_CHARS });
 
-// Camera Objects & Helper ////////////////////////////////////////////////////////////////////
-const camHelper = add([
-    pos(getCamPos().sub(width(), 0)),
-]);
-
-camHelper.onUpdate(() => setCamPos(camHelper.pos));
-
-onClick("camera_changer", (ch) => {
-    tween(camHelper.pos.x, ch.to.x, 0.9, (val) => camHelper.pos.x = val, easings.easeOutBounce)
-});
+loadFont("happy", "./fonts/happy.ttf");
 
 // Cursor ///////////////////////////////////////////////////////////////////////
 
@@ -122,21 +120,13 @@ const cts = add([
 ]);
 
 cts.onClick(() => {
-    tween(camHelper.pos.x, rooms[0].x, 0.9, (val) => camHelper.pos.x = val, easings.easeOutBounce)
     bgMusic = play("chillaxation", { volume: 0.05, loop: true });
 
     cts.destroy();
 });
 
 /// First UI and Scenario //////////////////////////////////////////////////////////////////////////
-const bg = add([
-    pos(0, 0),
-    rect(width(), height()),
-    color(bgs[0]),
-    {
-        cur: 0,
-    },
-]);
+let curBg = 0;
 
 const title = add([
     sprite("en_title"),
@@ -146,53 +136,82 @@ const title = add([
     tlsprite("title", ["en", "jp"])
 ]);
 
-/// Body parts ////////////////////////////////////////////////////////////////////////
-const body = add([
-    sprite("body"),
-    pos(center().x, height()),
-    anchor("bot"),
-    z(layers.body),
-]);
+// #region Body
 
-const hair = add([
-    pos(body.pos.add(0, -193)),
-    anchor("top"),
-    z(layers.hair),
-    "hair",
-    {
-        cur: 0,
-    },
-]);
+const BODY_POS = dynamicVec2(function(v) {
+    v.x = k.width() / 2;
+    v.y = k.height();
+ });
 
-add([
-    pos(body.pos.add(0, -193)),
-    anchor("top"),
-    z(layers.fronthair),
-    "fronthair",
-]);
+const HAIR_POS = dynamicVec2(function(v) {
+    v.x = BODY_POS.x;
+    v.y = BODY_POS.y - 193;
+})
 
-const face = add([
-    pos(center().x, height() - 86),
-    anchor("bot"),
-    z(layers.face),
-    "faces",
-    {
-        cur: 0,
-    }
-]);
+const FACE_POS = dynamicVec2(function(v) {
+    v.x = BODY_POS.x;
+    v.y = BODY_POS.y - 86;
+});
 
-const outfit = add([
-    pos(center().x, height()),
-    anchor("bot"),
-    z(layers.outfit),
-    "outfits",
-    {
-        cur: 0,
-    }
-]);
+const OUTFIT_POS = dynamicVec2(function(v) {
+    v.x = BODY_POS.x;
+    v.y = BODY_POS.y;
+});
+
+const curSelection = {
+    hair: 1,
+    face: 0,
+    outfit: 0,
+}
+
+const maxSelections = {
+    hair: HAIR_COUNT,
+    face: FACES_COUNT,
+    outfit: OUTFITS_COUNT,
+}
+
+const drawBody = () => {
+    drawSprite({
+        sprite: "hair",
+        anchor: "top",
+        pos: HAIR_POS,
+        frame: curSelection.hair - 1
+    });
+
+    drawSprite({
+        sprite: "body",
+        anchor: "bot",
+        pos: BODY_POS,
+    });
+
+    drawSprite({
+        sprite: "faces",
+        anchor: "bot",
+        pos: FACE_POS,
+        frame: curSelection.face,
+    });
+
+    drawSprite({
+        sprite: "outfits",
+        anchor: "bot",
+        pos: OUTFIT_POS,
+        frame: curSelection.outfit,
+    });
+
+    drawSprite({
+        sprite: "hair",
+        anchor: "top",
+        pos: HAIR_POS,
+        frame: curSelection.hair,
+    });
+};
+
+onDraw(() => {
+    drawBody();
+});
 
 const neko = add([
-    pos(body.pos.add(0, -158)),
+    pos(BODY_POS.add(0, -158)),
     sprite("neko"),
     anchor("center"),
     z(layers.belowbody),
@@ -200,14 +219,14 @@ const neko = add([
 ]);
 
 const sorbet = add([
-    pos(body.pos.add(-14, -178)),
+    pos(BODY_POS.add(-14, -178)),
     sprite("sorbet"),
     z(layers.belowbody),
     "extra",
 ]);
 
 const flush = add([
-    pos(body.pos.add(0, -118)),
+    pos(BODY_POS.add(0, -118)),
     sprite("flush"),
     anchor("center"),
     z(layers.belowface),
@@ -215,6 +234,8 @@ const flush = add([
 ]);
 
 get("extra").forEach((obj) => obj.hidden = true);
+
+// #endregion
 
 /// gui /////////////////////////////////////////////////////////////////////////
 const downloadButton = add([
@@ -246,16 +267,14 @@ const changeBG = add([
     area(),
     {
         change() {
-            if (bg.cur >= bgs.length) bg.cur = 0;
-
-            bg.color = bgs[bg.cur];
+            // Set curBg as +1 unless it reaches the end of the array
+            curBg = (curBg + 1) % bgs.length;
+            setBackground(bgs[curBg]);
         }
     }
 ]);
 
 changeBG.onClick(() => {
-    bg.cur++
-
     changeBG.change();
 });
 
@@ -285,14 +304,33 @@ add([
     "bc",
 ]);
 
-addLeftButton(body.pos.add(-85, -160), "hair");
-addRightButton(body.pos.add(83, -160), "hair");
+// #region Create Things Btns
+const POS_HAIR_BTN_L = dynamicVec2((v) => setVec2(v, BODY_POS.x - 85, BODY_POS.y - 160));
+const POS_HAIR_BTN_R = dynamicVec2((v) => setVec2(v, BODY_POS.x + 85, BODY_POS.y - 160));
+const POS_FACE_BTN_L = dynamicVec2((v) => setVec2(v, BODY_POS.x - 65, BODY_POS.y - 110));
+const POS_FACE_BTN_R = dynamicVec2((v) => setVec2(v, BODY_POS.x + 65, BODY_POS.y - 110));
+const POS_OUTFIT_BTN_L = dynamicVec2((v) => setVec2(v, BODY_POS.x - 70, BODY_POS.y - 28));
+const POS_OUTFIT_BTN_R = dynamicVec2((v) => setVec2(v, BODY_POS.x + 70, BODY_POS.y - 28));
 
-addLeftButton(body.pos.add(-65, -110), "faces");
-addRightButton(body.pos.add(63, -110), "faces");
+addButtons(POS_HAIR_BTN_L, POS_HAIR_BTN_R, "hair");
+addButtons(POS_FACE_BTN_L, POS_FACE_BTN_R, "faces");
+addButtons(POS_OUTFIT_BTN_L, POS_OUTFIT_BTN_R, "outfits");
+// #endregion
 
-addLeftButton(body.pos.add(-70, -28), "outfits");
-addRightButton(body.pos.add(68, -28), "outfits");
+// #region Create Accs Btns
+const POS_FLUSH_BTN = dynamicVec2((v) => setVec2(v, HAIR_POS.x - 120, HAIR_POS.y - 80));
+const POS_SORBET_BTN = dynamicVec2((v) => setVec2(v, BODY_POS.x - 24.5, BODY_POS.y - 80));
+const POS_NEKO_BTN = dynamicVec2((v) => setVec2(v, BODY_POS.x + 120 - 24.5, BODY_POS.y - 80));
+
+addSpriteCheckbox(
+    POS_FLUSH_BTN,
+    "flush",
+    false,
+    (check) => {
+        flush.hidden = !check;
+    }
+);
+// #endregion
 
 add([
     pos(center().x - 120 - 24.5, 80),
@@ -336,102 +374,6 @@ add([
     "bc",
 ]);
 
-// about screen
-const about = add([
-    pos(width() + 6, 0),
-]);
-
-add([
-    text("the juicy edit", { size: 22, font: "juiceisntbelow" }),
-    tltext([
-        { lang: "en", text: "the juicy edit" },
-    ]),
-    pos(about.pos.add(4, 10)),
-    color(74, 48, 82),
-]);
-
-about.add([
-    text("by lajbel", { size: 16 }),
-    pos(4, 30),
-    color(74, 48, 82),
-]);
-
-add([
-    text("Music", { size: 18, font: "juiceisntbelow" }),
-    tltext([
-        { lang: "en", text: "Music" },
-        { lang: "jp", text: "楽音" },
-    ]),
-    pos(about.pos.add(4, 54)),
-    color(74, 48, 82),
-]);
-
-about.add([
-    text("HibbityBibbityBop", { size: 16 }),
-    pos(4, 72),
-    color(74, 48, 82),
-]);
-
-add([
-    text("Publishing", { size: 18, font: "juiceisntbelow" }),
-    tltext([
-        { lang: "en", text: "Publishing" },
-    ]),
-    pos(about.pos.add(4, 96)),
-    color(74, 48, 82),
-]);
-
-about.add([
-    text("The Juicy Sorbet", { size: 16 }),
-    pos(4, 114),
-    color(74, 48, 82),
-]);
-
-about.add([
-    text("Japanese Translation", { size: 18 }),
-    pos(4, 138),
-    color(74, 48, 82),
-]);
-
-about.add([
-    text("Hoshi", { size: 16 }),
-    pos(4, 156),
-    color(74, 48, 82),
-]);
-
-about.add([
-    sprite("catwithhotdog"),
-    pos(230, 10),
-]);
-
-add([
-    sprite("about"),
-    anchor("topright"),
-    color(74, 48, 82),
-    pos(width() - 3, 3),
-    area(),
-    "camera_changer",
-    "bc",
-    "gui",
-    {
-        to: rooms[1],
-    }
-]);
-
-add([
-    sprite("arrow"),
-    anchor("botleft"),
-    color(74, 48, 82),
-    pos(width() + 3, height() - 5),
-    area(),
-    "camera_changer",
-    "bc",
-    "gui",
-    {
-        to: rooms[0],
-    }
-]);
-
 /// Some events
 onHover("bc", (o) => {
     o.color = rgb(31, 16, 42);
@@ -450,11 +392,11 @@ onHoverEnd("btn", (btn) => {
 });
 
 onClick("left", (b) => {
-    btn(b, true);
+    pressButton(b, true);
 });
 
 onClick("right", (b) => {
-    btn(b, false);
+    pressButton(b, false);
 });
 
 // keys /////////////////////////////////////////////////////////////////////////
@@ -466,21 +408,40 @@ onKeyPress("s", () => {
 
 /// functions ////////////////////////
 function addLeftButton(pos, toChange) {
-    addButton(1, pos, toChange, "left");
+    addButton(pos, toChange, "left");
 }
 
 function addRightButton(pos, toChange) {
-    addButton(0, pos, toChange, "right");
+    addButton(pos, toChange, "right");
 }
 
-function addButton(number, w, thing, side) {
-    add([
-        sprite("button", { flipX: number }),
-        color(212, 110, 179),
-        pos(w),
-        anchor("center"),
-        area(),
-        z(10),
+/**
+ * Add buttons in the screen
+ * 
+ * @param {Vec2} pos1 - The position of the left button
+ * @param {Vec2} pos2 - The position of the right button
+ * @param {string} thing - The thing that will be changed
+ */
+function addButtons(pos1, pos2, thing) {
+    addButton(pos1, thing, "left");
+    addButton(pos2, thing, "right");
+}
+
+/**
+ * Add a button to the screen
+ * 
+ * @param {Vec2} pos 
+ * @param {string} thing 
+ * @param {"left" | "right"} side 
+ */
+function addButton(pos, thing, side) {
+    k.add([
+        k.sprite("button", { flipX: side === "left" }),
+        k.color(212, 110, 179),
+        dynamicPos(() => pos),
+        k.anchor("center"),
+        k.area(),
+        k.z(10),
         "btn",
         "gui",
         thing,
@@ -489,13 +450,9 @@ function addButton(number, w, thing, side) {
 }
 
 function randomPart() {
-    hair.cur = Math.round((Math.random() * (HAIR_COUNT - 0) + 0) / 2) * 2;
-    face.cur = randi(FACES_COUNT);
-    outfit.cur = randi(OUTFITS_COUNT);
-
-    setPart2(HAIR_COUNT, "hair", "fronthair", true, false);
-    setPart(FACES_COUNT, "faces", true, false);
-    setPart(OUTFITS_COUNT, "outfits", true, false);
+    curSelection.hair = Math.round((Math.random() * (HAIR_COUNT - 0) + 0) / 2) * 2;
+    curSelection.face = randi(FACES_COUNT);
+    curSelection.outfit = randi(OUTFITS_COUNT);
 }
 
 function hideGui() {
@@ -520,47 +477,25 @@ function showGui() {
     });
 }
 
-function setPart(count, tag, sub, set = true) {
-    const obj = get(tag)[0];
 
-    if (set) {
-        if (sub) obj.cur--;
-        else obj.cur++;
-
-        if (obj.cur < 0) obj.cur = count;
-        else if (obj.cur > count) obj.cur = 0;
-    }
-
-    if (obj.cur === 0) obj.unuse("sprite");
-    else obj.use(sprite(tag, { frame: obj.cur - 1 }))
+/**
+ * Set a part of the character
+ * 
+ * @param {keyof typeof curSelection} part 
+ * @param {number} step 
+ */
+function setPart(part, step = 1) {
+    // avoid array out of bounds
+    curSelection[part] = Math.max(0, Math.min(curSelection[part] + step, maxSelections[part]));
 }
 
-function setPart2(count, tag, tag2, sub, set = true) {
-    const obj = get(tag)[0];
-    const obj2 = get(tag2)[0];
+function pressButton(b, s) {
+    let sum = b.is("left") ? -1 : 1;
+    sum = b.is("hair") ? sum * 2 : sum;
 
-    if (set) {
-        if (sub) obj.cur = obj.cur - 2;
-        else obj.cur = obj.cur + 2;
-
-        if (obj.cur < 0) obj.cur = count * 2;
-        else if (obj.cur > count * 2) obj.cur = 0;
-    }
-
-    if (obj.cur == 0) {
-        obj.unuse("sprite");
-        obj2.unuse("sprite");
-    }
-    else {
-        obj.use(sprite(tag, { frame: obj.cur - 2 }))
-        obj2.use(sprite(tag, { frame: obj.cur - 1 }))
-    }
-}
-
-function btn(b, s) {
-    if (b.is("hair")) setPart2(HAIR_COUNT, "hair", "fronthair", s);
-    else if (b.is("faces")) setPart(FACES_COUNT, "faces", s);
-    else if (b.is("outfits")) setPart(OUTFITS_COUNT, "outfits", s)
+    if (b.is("hair")) setPart("hair", sum);
+    else if (b.is("faces")) setPart("face", sum);
+    else if (b.is("outfits")) setPart("outfit", sum);
 }
 
 get("*").forEach((o) => {
@@ -574,3 +509,15 @@ get("*").forEach((o) => {
         c.use(sprite("default"));
     });
 });
+
+// #region Lifecycle
+onResize(() => {
+    for (const update of updateVec2) {
+        update()
+    }
+
+    for (const obj of updatePos) {
+        obj.updateDynamicPos();
+    }
+})
+// #endregion

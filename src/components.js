@@ -1,4 +1,4 @@
-import _k from "./main";
+import { k as _k } from "./main";
 
 export function download(filename, url) {
     const a = document.createElement("a");
