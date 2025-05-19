@@ -1,5 +1,5 @@
-import kaboom from "kaboom";
-import "kaboom/global";
+import kaboom from "kaplay";
+import "kaplay/global";
 import { checkbox, downloader, tltext, tlsprite } from "./components";
 
 // Start the Kaboom game
@@ -12,7 +12,6 @@ export default kaboom({
     touchToMouse: true,
     debug: true,
     font: "en_juiceisntbelow",
-    canvas: document.querySelector("#myGame"),
 });
 
 onUpdate(() => {
@@ -97,15 +96,6 @@ onClick("camera_changer", (ch) => {
 });
 
 // Cursor ///////////////////////////////////////////////////////////////////////
-
-// Remove the default cursor setted by Kaboom
-onLoad(() => {
-    const attr = document.getElementById("myGame").attributes.style.nodeValue;
-    document.getElementById("myGame").setAttribute("style", attr.replace("default", "none;"));
-})
-
-// Check if the canvas are hovered
-const canvasIsHover = () => canvas.parentElement.querySelector(':hover') === canvas;
 
 const c = add([
     sprite("default"),
