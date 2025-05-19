@@ -1,11 +1,10 @@
 // @ts-check
 
-import kaboom from "kaplay";
+import kaplay from "kaplay";
 import "kaplay/global";
 import { checkbox, downloader, tltext, tlsprite } from "./components";
 
-// Start the Kaboom game
-export default kaboom({
+export default kaplay({
     width: 576,
     height: 324,
     scale: 2,
@@ -14,10 +13,6 @@ export default kaboom({
     debug: true,
     font: "en_juiceisntbelow",
 });
-
-onUpdate(() => {
-    debug.log(debug.fps())
-})
 
 // configuration & variables
 const HAIR_COUNT = 35;
@@ -73,7 +68,6 @@ loadSprite("sorbet", "./sprites/sorbet.png");
 loadSprite("sorbet_icon", "./sprites/sorbet_icon.png");
 
 loadSprite("en_title", "./sprites/title.png");
-loadSprite("jp_title", "./sprites/jp_title.png");
 
 loadSprite("hair", "./sprites/hair.png", { sliceX: 10, sliceY: 7 });
 loadSprite("faces", "./sprites/faces.png", { sliceX: 7, sliceY: 6 });
@@ -114,7 +108,6 @@ add([
     text("click\n to\nstart", { size: 36, font: "juiceisntbelow" }),
     tltext([
         { lang: "en", text: "click\n\ to\nstart" },
-        { lang: "jp", text: "クリックして\n遊びます" }
     ]),
     color(74, 48, 82),
     anchor("center"),
@@ -241,7 +234,7 @@ add([
     z(50),
     area(),
     anchor("center"),
-    checkbox("guicheck", "incorrect", "", hideGui, showGui, "nohide", "ahide"),
+    checkbox("guicheck", "incorrect", "", hideGui, showGui, "nohide"),
     "bc",
 ]);
 
@@ -352,7 +345,6 @@ add([
     text("the juicy edit", { size: 22, font: "juiceisntbelow" }),
     tltext([
         { lang: "en", text: "the juicy edit" },
-        { lang: "jp", text: "ジュxスディト" }
     ]),
     pos(about.pos.add(4, 10)),
     color(74, 48, 82),
@@ -384,7 +376,6 @@ add([
     text("Publishing", { size: 18, font: "juiceisntbelow" }),
     tltext([
         { lang: "en", text: "Publishing" },
-        { lang: "jp", text: "出版社" }
     ]),
     pos(about.pos.add(4, 96)),
     color(74, 48, 82),
@@ -440,52 +431,6 @@ add([
         to: rooms[0],
     }
 ]);
-
-const changeJp = add([
-    text("jp"),
-    color(74, 48, 82),
-    pos(about.pos.add(width() - 10, height() - 10)),
-    area(),
-    anchor("botright"),
-    "bc",
-]);
-
-const changeEn = add([
-    text("en"),
-    pos(changeJp.pos.sub(60, 0)),
-    color(74, 48, 82),
-    area(),
-    anchor("botright"),
-    "bc",
-]);
-
-changeEn.onClick(() => {
-    get("tltext").forEach((t) => {
-        if (t.lang == "en") return;
-
-        t.changeLang("en");
-    });
-
-    get("tlsprite").forEach((t) => {
-        if (t.lang == "en") return;
-
-        t.changeLang("en");
-    });
-});
-
-changeJp.onClick(() => {
-    get("tltext").forEach((t) => {
-        if (t.lang == "jp") return;
-
-        t.changeLang("jp");
-    });
-
-    get("tlsprite").forEach((t) => {
-        if (t.lang == "jp") return;
-
-        t.changeLang("jp");
-    });
-});
 
 /// Some events
 onHover("bc", (o) => {
