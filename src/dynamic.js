@@ -1,7 +1,8 @@
-import { k } from "./main";
+import { k } from "./kaplay";
 
 /**
  * @typedef {import("kaplay").Vec2} Vec2
+ * @typedef {import("kaplay").GameObj} GameObj
  */
 
 /** @type { (() => Vec2)[] } */
@@ -33,6 +34,7 @@ export const updatePos = [];
 export function dynamicPos(pos) {
     return {
         id: "dynamicPos",
+        /** @type { (this: GameObj) => void } */
         add() {
             this.use(k.pos(pos()));
             updatePos.push(this)

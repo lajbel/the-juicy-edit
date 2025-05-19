@@ -1,4 +1,4 @@
-import { k as _k } from "./main";
+import { k as _k } from "./kaplay";
 
 export function download(filename, url) {
     const a = document.createElement("a");
@@ -18,7 +18,7 @@ export function downloader() {
         download() {
             let temp = onDraw(() => {
                 download("juicy_person.png", screenshot());
-                temp();
+                temp.cancel();
             })
         }
     }

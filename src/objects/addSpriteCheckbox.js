@@ -2,7 +2,7 @@
  * @typedef {import("kaplay").Vec2} Vec2
  */
 
-import { k } from "../main";
+import { k } from "../kaplay";
 import { dynamicPos } from "../dynamic";
 
 /**

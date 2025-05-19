@@ -1,6 +1,7 @@
 // @ts-check
 
-import kaplay from "kaplay";
+import { k } from "./kaplay";
+import "./loader";
 import "kaplay/global";
 import { checkbox, downloader, tltext, tlsprite } from "./components";
 import { dynamicPos, dynamicVec2, setVec2, updatePos, updateVec2 } from "./dynamic";
@@ -10,22 +11,11 @@ import { addSpriteCheckbox } from "./objects/addSpriteCheckbox";
  * @typedef {import("kaplay").Vec2} Vec2
  */
 
-export const k = kaplay({
-    scale: 2,
-    background: [141, 183, 255],
-    debug: true,
-    font: "happy",
-    crisp: true,
-    maxFPS: 120,
-    texFilter: "nearest",
-});
-
 // configuration & variables
 const HAIR_COUNT = 35;
 const FACES_COUNT = 40;
 const OUTFITS_COUNT = 35;
 
-const EN_CHARS = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890Ññ,.?!+-=_:;/\\¿¡@#'&*<>[]{}()$%€~`|";
 
 const bgs = [
     Color.fromHex("#8db7ff"),
@@ -50,42 +40,6 @@ const layers = {
 
 /** @type { import("kaplay").AudioPlay } */
 let bgMusic;
-
-// load assets //////////////////////////////////////////////////////////////////
-loadSprite("about", "./sprites/about.png");
-loadSprite("arrow", "./sprites/arrow.png");
-loadSprite("body", "./sprites/body.png");
-loadSprite("button", "./sprites/button.png");
-loadSprite("catwithhotdog", "./sprites/catwithhotdog.png");
-loadSprite("checkbox", "./sprites/checkbox.png");
-loadSprite("correct", "./sprites/correct.png");
-loadSprite("default", "./sprites/default.png");
-loadSprite("download", "./sprites/download.png");
-loadSprite("flush", "./sprites/flush.png");
-loadSprite("flush_icon", "./sprites/flush_icon.png");
-loadSprite("guicheck", "./sprites/guicheck.png");
-loadSprite("incorrect", "./sprites/incorrect.png");
-loadSprite("musiccheck", "./sprites/musiccheck.png");
-loadSprite("neko", "./sprites/neko.png");
-loadSprite("neko_icon", "./sprites/neko_icon.png");
-loadSprite("palette", "./sprites/palette.png");
-loadSprite("pointer", "./sprites/pointer.png");
-loadSprite("random", "./sprites/random.png");
-loadSprite("sorbet", "./sprites/sorbet.png");
-loadSprite("sorbet_icon", "./sprites/sorbet_icon.png");
-
-loadSprite("en_title", "./sprites/title.png");
-
-loadSprite("hair", "./sprites/hair.png", { sliceX: 10, sliceY: 7 });
-loadSprite("faces", "./sprites/faces.png", { sliceX: 7, sliceY: 6 });
-loadSprite("outfits", "./sprites/outfits.png", { sliceX: 5, sliceY: 7 });
-
-loadSound("chillaxation", "./sounds/chillaxation.mp3");
-
-loadBitmapFont("juiceisntbelow", "./sprites/thejuiceisntbelow.png", 26, 37, { chars: EN_CHARS });
-loadBitmapFont("en_juiceisntbelow", "./sprites/thejuiceisntbelow.png", 26, 37, { chars: EN_CHARS });
-
-loadFont("happy", "./fonts/happy.ttf");
 
 // Cursor ///////////////////////////////////////////////////////////////////////
 
