@@ -25,7 +25,6 @@ const FACES_COUNT = 40;
 const OUTFITS_COUNT = 35;
 
 const EN_CHARS = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890Ññ,.?!+-=_:;/\\¿¡@#'&*<>[]{}()$%€~`|";
-const JP_CHARS = " 下遊日本人描飲売使アプクリシジユュスネッツエデイトャュョィあいなだはぶじゃりまんしてすでがとうございのをつっxび楽音";
 
 const bgs = [
     rgb(141, 183, 255),
@@ -33,8 +32,8 @@ const bgs = [
 ];
 
 const rooms = [
-    camPos().clone(),
-    camPos().clone().add(width(), 0),
+    getCamPos().clone(),
+    getCamPos().clone().add(width(), 0),
 ];
 
 const layers = {
@@ -84,14 +83,13 @@ loadSound("chillaxation", "./sounds/chillaxation.mp3");
 
 loadBitmapFont("juiceisntbelow", "./sprites/thejuiceisntbelow.png", 26, 37, { chars: EN_CHARS });
 loadBitmapFont("en_juiceisntbelow", "./sprites/thejuiceisntbelow.png", 26, 37, { chars: EN_CHARS });
-loadBitmapFont("jp_juiceisntbelow", "./sprites/ジュースは下じゃありません.png", 26, 37, { chars: JP_CHARS });
 
 // Camera Objects & Helper ////////////////////////////////////////////////////////////////////
 const camHelper = add([
-    pos(camPos().sub(width(), 0)),
+    pos(getCamPos().sub(width(), 0)),
 ]);
 
-camHelper.onUpdate(() => camPos(camHelper.pos));
+camHelper.onUpdate(() => setCamPos(camHelper.pos));
 
 onClick("camera_changer", (ch) => {
     tween(camHelper.pos.x, ch.to.x, 0.9, (val) => camHelper.pos.x = val, easings.easeOutBounce)
