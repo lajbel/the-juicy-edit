@@ -3,9 +3,17 @@
 import { k } from "./kaplay";
 import "./loader";
 import "kaplay/global";
-import { checkbox, downloader, tltext, tlsprite } from "./components";
-import { dynamicPos, dynamicVec2, setVec2, updatePos, updateVec2 } from "./dynamic";
+import { checkbox, downloader, tlsprite, tltext } from "./components";
+import {
+    dynamicPos,
+    dynamicScale,
+    dynamicVec2,
+    setVec2,
+    updateDynamic,
+    updateVec2,
+} from "./dynamic";
 import { addSpriteCheckbox } from "./objects/addSpriteCheckbox";
+import { s } from "./shared";
 
 /**
  * @typedef {import("kaplay").Vec2} Vec2
@@ -16,30 +24,10 @@ const HAIR_COUNT = 35;
 const FACES_COUNT = 40;
 const OUTFITS_COUNT = 35;
 
-
-const bgs = [
-    Color.fromHex("#8db7ff"),
-    Color.fromHex("#ffc3f2"),
-    Color.fromHex("#c97373"),
-];
-
-const rooms = [
-    getCamPos().clone(),
-    getCamPos().clone().add(width(), 0),
-];
-
-const layers = {
-    belowbody: 1,
-    hair: 2,
-    body: 3,
-    belowface: 4,
-    face: 5,
-    outfit: 6,
-    fronthair: 7,
-}
-
+// #region State
 /** @type { import("kaplay").AudioPlay } */
 let bgMusic;
+// #endregion
 
 // Cursor ///////////////////////////////////////////////////////////////////////
 
@@ -50,7 +38,7 @@ const c = add([
     fixed(),
     {
         h: false,
-    }
+    },
 ]);
 
 c.hidden = true;
@@ -79,264 +67,231 @@ cts.onClick(() => {
     cts.destroy();
 });
 
-/// First UI and Scenario //////////////////////////////////////////////////////////////////////////
+// #region Logo
 let curBg = 0;
 
-const title = add([
-    sprite("en_title"),
-    pos(center().x - 25, 30),
-    anchor("center"),
-    z(50),
-    tlsprite("title", ["en", "jp"])
-]);
+const LOGO_POS = dynamicVec2((v) => setVec2(v, k.width() / 2, 20));
+
+function drawLogo() {
+    drawSprite({
+        sprite: "logo",
+        pos: LOGO_POS,
+        anchor: "top",
+    });
+}
+
+onDraw(() => {
+    drawLogo();
+});
+// #endregion
 
 // #region Body
 
-const BODY_POS = dynamicVec2(function(v) {
-    v.x = k.width() / 2;
-    v.y = k.height();
- });
+const BODY_POS = dynamicVec2((v) => setVec2(v, k.width() / 2, k.height()));
 
-const HAIR_POS = dynamicVec2(function(v) {
-    v.x = BODY_POS.x;
-    v.y = BODY_POS.y - 193;
-})
+const HEAD_POS = dynamicVec2((v) =>
+    setVec2(v, BODY_POS.x, BODY_POS.y - (43 * s.zoom))
+);
 
-const FACE_POS = dynamicVec2(function(v) {
+const FACE_POS = dynamicVec2((v) =>
+    setVec2(v, BODY_POS.x, BODY_POS.y - (86 * s.zoom))
+);
+
+const NEKO_POS = dynamicVec2((v) => {
     v.x = BODY_POS.x;
-    v.y = BODY_POS.y - 86;
+    v.y = BODY_POS.y - (134 * s.zoom);
 });
 
-const OUTFIT_POS = dynamicVec2(function(v) {
+const SORBET_POS = dynamicVec2((v) => {
+    v.x = BODY_POS.x + (40 * s.zoom);
+    v.y = BODY_POS.y - (130 * s.zoom);
+});
+
+const FLUSH_POS = dynamicVec2((v) => {
     v.x = BODY_POS.x;
-    v.y = BODY_POS.y;
+    v.y = BODY_POS.y - (84 * s.zoom);
 });
 
 const curSelection = {
-    hair: 1,
+    hair: 0,
     face: 0,
     outfit: 0,
-}
+};
+
+const curParts = {
+    flush: false,
+    neko: false,
+    sorbet: false,
+};
 
 const maxSelections = {
     hair: HAIR_COUNT,
     face: FACES_COUNT,
     outfit: OUTFITS_COUNT,
-}
+};
 
 const drawBody = () => {
-    drawSprite({
-        sprite: "hair",
-        anchor: "top",
-        pos: HAIR_POS,
-        frame: curSelection.hair - 1
-    });
+    if (curParts.sorbet) {
+        drawSprite({
+            sprite: "sorbet",
+            pos: SORBET_POS,
+            anchor: "bot",
+            scale: vec2(s.zoom),
+        });
+    }
+
+    if (curParts.neko) {
+        drawSprite({
+            sprite: "neko",
+            anchor: "bot",
+            pos: NEKO_POS,
+            scale: vec2(s.zoom),
+        });
+    }
+
+    if (curSelection.hair > 0) {
+        drawSprite({
+            sprite: "hair",
+            anchor: "bot",
+            pos: HEAD_POS,
+            frame: curSelection.hair - 2,
+            scale: vec2(s.zoom),
+        });
+    }
 
     drawSprite({
         sprite: "body",
         anchor: "bot",
         pos: BODY_POS,
+        scale: vec2(s.zoom),
     });
 
-    drawSprite({
-        sprite: "faces",
-        anchor: "bot",
-        pos: FACE_POS,
-        frame: curSelection.face,
-    });
+    if (curSelection.face > 0) {
+        drawSprite({
+            sprite: "faces",
+            anchor: "bot",
+            pos: FACE_POS,
+            frame: curSelection.face - 1,
+            scale: vec2(s.zoom),
+        });
+    }
 
-    drawSprite({
-        sprite: "outfits",
-        anchor: "bot",
-        pos: OUTFIT_POS,
-        frame: curSelection.outfit,
-    });
+    if (curSelection.outfit > 0) {
+        drawSprite({
+            sprite: "outfits",
+            anchor: "bot",
+            pos: BODY_POS,
+            frame: curSelection.outfit - 1,
+            scale: vec2(s.zoom),
+        });
+    }
 
-    drawSprite({
-        sprite: "hair",
-        anchor: "top",
-        pos: HAIR_POS,
-        frame: curSelection.hair,
-    });
+    if (curParts.flush) {
+        drawSprite({
+            sprite: "flush",
+            anchor: "bot",
+            pos: FLUSH_POS,
+            scale: vec2(s.zoom),
+        });
+    }
+
+    if (curSelection.hair > 0) {
+        drawSprite({
+            sprite: "hair",
+            anchor: "bot",
+            pos: HEAD_POS,
+            frame: curSelection.hair - 1,
+            scale: vec2(s.zoom),
+        });
+    }
 };
 
 onDraw(() => {
     drawBody();
 });
-
-const neko = add([
-    pos(BODY_POS.add(0, -158)),
-    sprite("neko"),
-    anchor("center"),
-    z(layers.belowbody),
-    "extra",
-]);
-
-const sorbet = add([
-    pos(BODY_POS.add(-14, -178)),
-    sprite("sorbet"),
-    z(layers.belowbody),
-    "extra",
-]);
-
-const flush = add([
-    pos(BODY_POS.add(0, -118)),
-    sprite("flush"),
-    anchor("center"),
-    z(layers.belowface),
-    "extra",
-]);
-
-get("extra").forEach((obj) => obj.hidden = true);
-
 // #endregion
 
-/// gui /////////////////////////////////////////////////////////////////////////
-const downloadButton = add([
-    sprite("download"),
-    color(74, 48, 82),
-    anchor("center"),
-    pos(25, 146),
-    z(50),
-    area(),
-    downloader(),
-    "bc",
-]);
-
-add([
-    pos(25, 196),
-    color(74, 48, 82),
-    z(50),
-    area(),
-    anchor("center"),
-    checkbox("guicheck", "incorrect", "", hideGui, showGui, "nohide"),
-    "bc",
-]);
-
-const changeBG = add([
-    sprite("palette"),
-    anchor("center"),
-    pos(title.pos.add(160, 0)),
-    z(50),
-    area(),
-    {
-        change() {
-            // Set curBg as +1 unless it reaches the end of the array
-            curBg = (curBg + 1) % bgs.length;
-            setBackground(bgs[curBg]);
-        }
-    }
-]);
-
-changeBG.onClick(() => {
-    changeBG.change();
-});
-
-const random = add([
-    sprite("random"),
-    color(74, 48, 82),
-    anchor("center"),
-    pos(25, 296),
-    z(50),
-    area(),
-    "bc",
-]);
-
-random.onClick(randomPart);
-
-add([
-    pos(25, 246),
-    color(74, 48, 82),
-    z(50),
-    area(),
-    anchor("center"),
-    checkbox("musiccheck", "incorrect", "",
-        () => bgMusic.volume = 0,
-        () => bgMusic.volume = 0.05,
-        "nohide",
-    ),
-    "bc",
-]);
-
 // #region Create Things Btns
-const POS_HAIR_BTN_L = dynamicVec2((v) => setVec2(v, BODY_POS.x - 85, BODY_POS.y - 160));
-const POS_HAIR_BTN_R = dynamicVec2((v) => setVec2(v, BODY_POS.x + 85, BODY_POS.y - 160));
-const POS_FACE_BTN_L = dynamicVec2((v) => setVec2(v, BODY_POS.x - 65, BODY_POS.y - 110));
-const POS_FACE_BTN_R = dynamicVec2((v) => setVec2(v, BODY_POS.x + 65, BODY_POS.y - 110));
-const POS_OUTFIT_BTN_L = dynamicVec2((v) => setVec2(v, BODY_POS.x - 70, BODY_POS.y - 28));
-const POS_OUTFIT_BTN_R = dynamicVec2((v) => setVec2(v, BODY_POS.x + 70, BODY_POS.y - 28));
+const HAIR_BTN_L_POS = dynamicVec2((v) =>
+    setVec2(v, BODY_POS.x - (85 * s.zoom), BODY_POS.y - (160 * s.zoom))
+);
+const HAIR_BTN_R_POS = dynamicVec2((v) =>
+    setVec2(v, BODY_POS.x + (85 * s.zoom), BODY_POS.y - (160 * s.zoom))
+);
+const FACE_BTN_L_POS = dynamicVec2((v) =>
+    setVec2(v, BODY_POS.x - (65 * s.zoom), BODY_POS.y - (110 * s.zoom))
+);
+const FACE_BTN_R_POS = dynamicVec2((v) =>
+    setVec2(v, BODY_POS.x + (65 * s.zoom), BODY_POS.y - (110 * s.zoom))
+);
+const DRESS_BTN_L_POS = dynamicVec2((v) =>
+    setVec2(v, BODY_POS.x - (70 * s.zoom), BODY_POS.y - (28 * s.zoom))
+);
+const DRESS_BTN_R_POS = dynamicVec2((v) =>
+    setVec2(v, BODY_POS.x + (70 * s.zoom), BODY_POS.y - (28 * s.zoom))
+);
 
-addButtons(POS_HAIR_BTN_L, POS_HAIR_BTN_R, "hair");
-addButtons(POS_FACE_BTN_L, POS_FACE_BTN_R, "faces");
-addButtons(POS_OUTFIT_BTN_L, POS_OUTFIT_BTN_R, "outfits");
+addButtons(HAIR_BTN_L_POS, HAIR_BTN_R_POS, "hair");
+addButtons(FACE_BTN_L_POS, FACE_BTN_R_POS, "faces");
+addButtons(DRESS_BTN_L_POS, DRESS_BTN_R_POS, "outfits");
 // #endregion
 
 // #region Create Accs Btns
-const POS_FLUSH_BTN = dynamicVec2((v) => setVec2(v, HAIR_POS.x - 120, HAIR_POS.y - 80));
-const POS_SORBET_BTN = dynamicVec2((v) => setVec2(v, BODY_POS.x - 24.5, BODY_POS.y - 80));
-const POS_NEKO_BTN = dynamicVec2((v) => setVec2(v, BODY_POS.x + 120 - 24.5, BODY_POS.y - 80));
+const SPRITE_CBOX_SEPARATION = () => 60 * s.zoom;
+const CHECKBOX_Y_SEPARATION = () => HEAD_POS.y - (180 * s.zoom);
+
+const POS_FLUSH_BTN = dynamicVec2((v) =>
+    setVec2(
+        v,
+        HEAD_POS.x - SPRITE_CBOX_SEPARATION(),
+        CHECKBOX_Y_SEPARATION(),
+    )
+);
+const POS_NEKO_BTN = dynamicVec2((v) =>
+    setVec2(v, HEAD_POS.x, CHECKBOX_Y_SEPARATION())
+);
+const SORBET_BTN_POS = dynamicVec2((v) =>
+    setVec2(
+        v,
+        HEAD_POS.x + SPRITE_CBOX_SEPARATION(),
+        CHECKBOX_Y_SEPARATION(),
+    )
+);
+
+const SPRITE_CHECKBOX_SIZE = vec2(50, 50);
 
 addSpriteCheckbox(
     POS_FLUSH_BTN,
-    "flush",
+    "accessory_flush",
+    SPRITE_CHECKBOX_SIZE,
     false,
     (check) => {
-        flush.hidden = !check;
-    }
+        curParts.flush = check;
+    },
+);
+
+addSpriteCheckbox(
+    POS_NEKO_BTN,
+    "accessory_neko",
+    SPRITE_CHECKBOX_SIZE,
+    false,
+    (check) => {
+        curParts.neko = check;
+    },
+);
+
+addSpriteCheckbox(
+    SORBET_BTN_POS,
+    "accessory_sorbet",
+    SPRITE_CHECKBOX_SIZE,
+    false,
+    (check) => {
+        curParts.sorbet = check;
+    },
 );
 // #endregion
 
-add([
-    pos(center().x - 120 - 24.5, 80),
-    z(50),
-    color(74, 48, 82),
-    area(),
-    anchor("center"),
-    checkbox("checkbox", "correct", "sorbet_icon",
-        () => sorbet.hidden = false,
-        () => sorbet.hidden = true
-    ),
-    "gui",
-    "bc",
-]);
-
-add([
-    pos(center().x - 24.5, 80),
-    color(74, 48, 82),
-    z(50),
-    area(),
-    anchor("center"),
-    checkbox("checkbox", "correct", "flush_icon",
-        () => flush.hidden = false,
-        () => flush.hidden = true
-    ),
-    "gui",
-    "bc",
-]);
-
-add([
-    pos(center().x + 120 - 24.5, 80),
-    z(50),
-    color(74, 48, 82),
-    area(),
-    anchor("center"),
-    checkbox("checkbox", "correct", "neko_icon",
-        () => neko.hidden = false,
-        () => neko.hidden = true
-    ),
-    "gui",
-    "bc",
-]);
-
 /// Some events
-onHover("bc", (o) => {
-    o.color = rgb(31, 16, 42);
-});
-
-onHoverEnd("bc", (o) => {
-    o.color = rgb(74, 48, 82);
-});
-
 onHover("btn", (btn) => {
     btn.color = rgb(135, 62, 132);
 });
@@ -356,22 +311,10 @@ onClick("right", (b) => {
 // keys /////////////////////////////////////////////////////////////////////////
 onKeyPressRepeat("r", randomPart);
 
-onKeyPress("s", () => {
-    downloadButton.download();
-});
-
 /// functions ////////////////////////
-function addLeftButton(pos, toChange) {
-    addButton(pos, toChange, "left");
-}
-
-function addRightButton(pos, toChange) {
-    addButton(pos, toChange, "right");
-}
-
 /**
  * Add buttons in the screen
- * 
+ *
  * @param {Vec2} pos1 - The position of the left button
  * @param {Vec2} pos2 - The position of the right button
  * @param {string} thing - The thing that will be changed
@@ -383,16 +326,17 @@ function addButtons(pos1, pos2, thing) {
 
 /**
  * Add a button to the screen
- * 
- * @param {Vec2} pos 
- * @param {string} thing 
- * @param {"left" | "right"} side 
+ *
+ * @param {Vec2} pos
+ * @param {string} thing
+ * @param {"left" | "right"} side
  */
 function addButton(pos, thing, side) {
     k.add([
         k.sprite("button", { flipX: side === "left" }),
         k.color(212, 110, 179),
         dynamicPos(() => pos),
+        dynamicScale(() => s.zoom),
         k.anchor("center"),
         k.area(),
         k.z(10),
@@ -404,43 +348,27 @@ function addButton(pos, thing, side) {
 }
 
 function randomPart() {
-    curSelection.hair = Math.round((Math.random() * (HAIR_COUNT - 0) + 0) / 2) * 2;
+    curSelection.hair = Math.round((Math.random() * (HAIR_COUNT - 0) + 0) / 2)
+        * 2;
     curSelection.face = randi(FACES_COUNT);
     curSelection.outfit = randi(OUTFITS_COUNT);
 }
 
-function hideGui() {
-    get("gui").forEach((g) => {
-        if (!g.is("nohide")) g.hidden = true;
-    });
-}
-
-function showGui() {
-    get("gui").forEach((g) => {
-        if (g.is("ahide")) {
-            g.hidden = true;
-        }
-        else {
-            if (g.is("check")) {
-                g.hidden = !g.checked;
-            }
-            else {
-                g.hidden = false;
-            }
-        }
-    });
-}
-
-
 /**
  * Set a part of the character
- * 
- * @param {keyof typeof curSelection} part 
- * @param {number} step 
+ *
+ * @param {keyof typeof curSelection} part
+ * @param {number} step
  */
 function setPart(part, step = 1) {
-    // avoid array out of bounds
-    curSelection[part] = Math.max(0, Math.min(curSelection[part] + step, maxSelections[part]));
+    curSelection[part] += step;
+
+    if (curSelection[part] < 0) {
+        curSelection[part] = maxSelections[part];
+    }
+    else if (curSelection[part] > maxSelections[part]) {
+        curSelection[part] = 0;
+    }
 }
 
 function pressButton(b, s) {
@@ -464,14 +392,43 @@ get("*").forEach((o) => {
     });
 });
 
+// #region Mobile Gesture
+let startDistance = 0;
+let scale = 1;
+
+function getDistance(touches) {
+    const [a, b] = touches;
+    const dx = b.clientX - a.clientX;
+    const dy = b.clientY - a.clientY;
+    return Math.hypot(dx, dy);
+}
+
+const element = k.canvas;
+
+element.addEventListener("touchstart", (e) => {
+    if (e.touches.length === 2) {
+        startDistance = getDistance(e.touches);
+    }
+});
+
+element.addEventListener("touchmove", (e) => {
+    if (e.touches.length === 2) {
+        const currentDistance = getDistance(e.touches);
+        const newZoom = currentDistance / startDistance;
+        s.zoom = newZoom;
+    }
+});
+
 // #region Lifecycle
-onResize(() => {
+// TODO: Optimize this
+onUpdate(() => {
     for (const update of updateVec2) {
-        update()
+        update();
     }
 
-    for (const obj of updatePos) {
-        obj.updateDynamicPos();
+    for (const obj of updateDynamic) {
+        obj.updateDynamicPos?.();
+        obj.updateDynamicScale?.();
     }
-})
+});
 // #endregion

@@ -6,6 +6,7 @@ k.loadSprite("about", "./sprites/about.png");
 k.loadSprite("arrow", "./sprites/arrow.png");
 k.loadSprite("body", "./sprites/body.png");
 k.loadSprite("button", "./sprites/button.png");
+k.loadSprite("logo", "./sprites/logo/logo.png");
 k.loadSprite("catwithhotdog", "./sprites/catwithhotdog.png");
 k.loadSprite("checkbox", "./sprites/checkbox.png");
 k.loadSprite("correct", "./sprites/correct.png");
@@ -23,6 +24,9 @@ k.loadSprite("pointer", "./sprites/pointer.png");
 k.loadSprite("random", "./sprites/random.png");
 k.loadSprite("sorbet", "./sprites/sorbet.png");
 k.loadSprite("sorbet_icon", "./sprites/sorbet_icon.png");
+k.loadSprite("accessory_flush", "./sprites/accesories/accesories2.png");
+k.loadSprite("accessory_neko", "./sprites/accesories/accesories3.png");
+k.loadSprite("accessory_sorbet", "./sprites/accesories/accesories1.png");
 
 k.loadSprite("en_title", "./sprites/title.png");
 

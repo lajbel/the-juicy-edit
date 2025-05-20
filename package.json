@@ -6,15 +6,17 @@
 		"serve": "esbuild --servedir=."
 	},
 	"dependencies": {
+		"@kaplayjs/dprint-config": "^1.2.0",
 		"@replit/database": "^2.0.1",
 		"@types/copyfiles": "^2.4.1",
 		"adm-zip": "^0.5.9",
 		"copyfiles": "^2.4.1",
+		"dprint": "^0.50.0",
 		"esbuild": "^0.15.10",
 		"express": "^4.17.1",
 		"fs-extra": "^10.1.0",
 		"kaboom": "^3000.0.0-alpha.20",
-		"kaplay": "4000.0.0-alpha.19",
+		"kaplay": "github:kaplayjs/kaplay",
 		"stacktrace-js": "^2.0.2",
 		"ws": "^8.2.0"
 	},
