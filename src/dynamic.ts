@@ -1,19 +1,13 @@
+import { Comp, GameObj, Vec2 } from "kaplay";
 import { k } from "./kaplay";
 
-/**
- * @typedef {import("kaplay").Vec2} Vec2
- * @typedef {import("kaplay").GameObj} GameObj
- */
-
-/** @type { (() => Vec2)[] } */
-export const updateVec2 = [];
+export const updateVec2: (() => Vec2)[] = [];
 
 /**
  * Set a dynamic vec2 that will be updated onResize
- *
- * @param {(v: Vec2) => void} vec
+ * @param vec
  */
-export function dynamicVec2(vec) {
+export function dynamicVec2(vec: (v: Vec2) => void) {
     const v = vec2();
     const update = vec.bind(null, v);
 
@@ -23,19 +17,21 @@ export function dynamicVec2(vec) {
     return v;
 }
 
-/** @type {(GameObj)[]} */
-export const updateDynamic = [];
+export const updateDynamic: GameObj[] = [];
+
+interface DynamicPosComp extends Comp {
+    updateDynamicPos: () => void
+}
 
 /**
  * Create a dynamic pos component
  *
- * @param {() => Vec2} pos
+ * @param pos
  */
-export function dynamicPos(pos) {
+export function dynamicPos(pos: () => Vec2) : DynamicPosComp {
     return {
         id: "dynamicPos",
-        /** @type { (this: GameObj) => void } */
-        add() {
+        add(this: GameObj) {
             this.use(k.pos(pos()));
             updateDynamic.push(this);
         },
@@ -45,16 +41,19 @@ export function dynamicPos(pos) {
     };
 }
 
+interface DynamicScaleComp extends Comp {
+    updateDynamicScale: () => void
+}
+
 /**
  * Create a dynamic scale component
  *
- * @param {() => number} scale
+ * @param scale
  */
-export function dynamicScale(scale) {
+export function dynamicScale(scale: () => number) : DynamicScaleComp {
     return {
         id: "dynamicScale",
-        /** @type { (this: GameObj) => void } */
-        add() {
+        add(this: GameObj) {
             this.use(k.scale(scale()));
             updateDynamic.push(this);
         },
@@ -68,11 +67,11 @@ export function dynamicScale(scale) {
 /**
  * Set a vec2 to a specific x and y mutating the original vec2
  *
- * @param {Vec2} v
- * @param {number} x
- * @param {number} y
+ * @param v
+ * @param x
+ * @param y
  */
-export function setVec2(v, x, y) {
+export function setVec2(v: Vec2, x: number, y: number) {
     v.x = x;
     v.y = y;
 }

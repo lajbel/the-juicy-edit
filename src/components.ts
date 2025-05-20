@@ -1,6 +1,6 @@
 import { k as _k } from "./kaplay";
 
-export function download(filename, url) {
+export function download(filename: string, url: string) {
     const a = document.createElement("a");
     a.href = url;
     a.download = filename;
@@ -24,7 +24,7 @@ export function downloader() {
     }
 }
 
-export function checkbox(spr, spr2, icon, oncheck, onuncheck, extraT = "unuseful") {
+export function checkbox(spr: string, spr2: string, icon: string, oncheck: () => void, onuncheck: () => void, extraT: string = "unuseful") {
     return {
         id: "checkbox",
         requires: ["area"],
@@ -83,7 +83,7 @@ export function checkbox(spr, spr2, icon, oncheck, onuncheck, extraT = "unuseful
     }
 }
 
-export function tlsprite(spr, langs) {
+export function tlsprite(spr: string, langs: string[]) {
     return {
         id: "tlsprite",
         require: ["sprite"],
@@ -93,14 +93,14 @@ export function tlsprite(spr, langs) {
             this.langs = langs;
         },
 
-        changeLang(lang) {
+        changeLang(lang: string) {
             this.lang = lang;
             this.use(sprite(`${lang}_${spr}`))
         }
     }
 }
 
-export function tltext(texts) {
+export function tltext(texts: { lang: string; text: string }[]) {
     return {
         id: "tltext",
         require: ["text"],
@@ -113,12 +113,12 @@ export function tltext(texts) {
 
             this.dfont = this.font;
             
-            texts.map((t) => {
+            texts.map((t: { lang: string; }) => {
                 this.langs.set(t.lang, t);
             });
         },
 
-        changeLang(lang) {
+        changeLang(lang: string) {
             const l = this.langs.get(lang);
             this.lang = lang;
 

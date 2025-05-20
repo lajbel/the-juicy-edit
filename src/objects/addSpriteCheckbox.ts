@@ -1,7 +1,4 @@
-/**
- * @typedef {import("kaplay").Vec2} Vec2
- */
-
+import { Vec2 } from "kaplay";
 import { dynamicPos, dynamicScale } from "../dynamic";
 import { k } from "../kaplay";
 import { s } from "../shared";
@@ -9,13 +6,13 @@ import { s } from "../shared";
 /**
  * A sprite that is a checkbox.
  *
- * @param {Vec2} pos - The position of the checkbox.
- * @param {string} sprite - The sprite to use for the checkbox.
- * @param {Vec2} areaSize - The size of the area to use for the checkbox.
- * @param {boolean} enabled - Whether the checkbox is enabled or not.
- * @param {(check: boolean) => void} onCheck - The function to call when the checkbox is checked.
+ * @param pos - The position of the checkbox.
+ * @param sprite - The sprite to use for the checkbox.
+ * @param areaSize - The size of the area to use for the checkbox.
+ * @param enabled - Whether the checkbox is enabled or not.
+ * @param onCheck - The function to call when the checkbox is checked.
  */
-export function addSpriteCheckbox(pos, sprite, areaSize, enabled, onCheck) {
+export function addSpriteCheckbox(pos: Vec2, sprite: string, areaSize: Vec2, enabled: boolean, onCheck: (check: boolean) => void) {
     const DISABLED_OPACITY = 0.5;
     const ENABLED_OPACITY = 1;
     const DISABLED_SCALE = 0.8;
