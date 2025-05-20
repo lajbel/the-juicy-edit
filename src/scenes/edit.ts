@@ -1,7 +1,6 @@
 import { k } from "../kaplay";
 import "kaplay/global";
-import "./loader";
-import { AudioPlay, GameObj, Vec2 } from "kaplay";
+import { GameObj, Vec2 } from "kaplay";
 import {
     dynamicPos,
     dynamicScale,
@@ -13,17 +12,8 @@ import {
 import { addSpriteCheckbox } from "../objects/addSpriteCheckbox";
 import { s } from "../shared";
 
-// configuration & variables
-const HAIR_COUNT = 35;
-const FACES_COUNT = 40;
-const OUTFITS_COUNT = 35;
-
-// #region State
-let bgMusic: AudioPlay;
-// #endregion
-
 k.scene("edit", () => {
-    bgMusic = play("chillaxation", { volume: 0.05, loop: true });
+    const bgMusic = play("chillaxation", { volume: 0.05, loop: true });
 
     // #region Logo
     const LOGO_POS = dynamicVec2((v) => setVec2(v, k.width() / 2, 20));
@@ -68,26 +58,8 @@ k.scene("edit", () => {
         v.y = BODY_POS.y - (84 * s.zoom);
     });
 
-    const curSelection = {
-        hair: 0,
-        face: 0,
-        outfit: 0,
-    };
-
-    const curParts = {
-        flush: false,
-        neko: false,
-        sorbet: false,
-    };
-
-    const maxSelections = {
-        hair: HAIR_COUNT,
-        face: FACES_COUNT,
-        outfit: OUTFITS_COUNT,
-    };
-
     const drawBody = () => {
-        if (curParts.sorbet) {
+        if (s.enabledAccesories.sorbet) {
             drawSprite({
                 sprite: "sorbet",
                 pos: SORBET_POS,
@@ -96,7 +68,7 @@ k.scene("edit", () => {
             });
         }
 
-        if (curParts.neko) {
+        if (s.enabledAccesories.neko) {
             drawSprite({
                 sprite: "neko",
                 anchor: "bot",
@@ -105,12 +77,12 @@ k.scene("edit", () => {
             });
         }
 
-        if (curSelection.hair > 0) {
+        if (s.curParts.hair > 0) {
             drawSprite({
-                sprite: "hair",
+                sprite: "hairstyles",
                 anchor: "bot",
                 pos: HEAD_POS,
-                frame: curSelection.hair - 2,
+                frame: s.curParts.hair - 1,
                 scale: vec2(s.zoom),
             });
         }
@@ -122,27 +94,27 @@ k.scene("edit", () => {
             scale: vec2(s.zoom),
         });
 
-        if (curSelection.face > 0) {
+        if (s.curParts.face > 0) {
             drawSprite({
                 sprite: "faces",
                 anchor: "bot",
                 pos: FACE_POS,
-                frame: curSelection.face - 1,
+                frame: s.curParts.face - 1,
                 scale: vec2(s.zoom),
             });
         }
 
-        if (curSelection.outfit > 0) {
+        if (s.curParts.outfit > 0) {
             drawSprite({
                 sprite: "outfits",
                 anchor: "bot",
                 pos: BODY_POS,
-                frame: curSelection.outfit - 1,
+                frame: s.curParts.outfit - 1,
                 scale: vec2(s.zoom),
             });
         }
 
-        if (curParts.flush) {
+        if (s.enabledAccesories.flush) {
             drawSprite({
                 sprite: "flush",
                 anchor: "bot",
@@ -151,12 +123,12 @@ k.scene("edit", () => {
             });
         }
 
-        if (curSelection.hair > 0) {
+        if (s.curParts.hair > 0) {
             drawSprite({
-                sprite: "hair",
+                sprite: "tophairstyles",
                 anchor: "bot",
                 pos: HEAD_POS,
-                frame: curSelection.hair - 1,
+                frame: s.curParts.hair - 1,
                 scale: vec2(s.zoom),
             });
         }
@@ -222,7 +194,7 @@ k.scene("edit", () => {
         SPRITE_CHECKBOX_SIZE,
         false,
         (check) => {
-            curParts.flush = check;
+            s.enabledAccesories.flush = check;
         },
     );
 
@@ -232,7 +204,7 @@ k.scene("edit", () => {
         SPRITE_CHECKBOX_SIZE,
         false,
         (check) => {
-            curParts.neko = check;
+            s.enabledAccesories.neko = check;
         },
     );
 
@@ -242,7 +214,7 @@ k.scene("edit", () => {
         SPRITE_CHECKBOX_SIZE,
         false,
         (check) => {
-            curParts.sorbet = check;
+            s.enabledAccesories.sorbet = check;
         },
     );
     // #endregion
@@ -304,33 +276,29 @@ k.scene("edit", () => {
     }
 
     function randomPart() {
-        curSelection.hair =
-            Math.round((Math.random() * (HAIR_COUNT - 0) + 0) / 2)
+        s.curParts.hair =
+            Math.round((Math.random() * (s.parts.hair - 0) + 0) / 2)
             * 2;
-        curSelection.face = randi(FACES_COUNT);
-        curSelection.outfit = randi(OUTFITS_COUNT);
+        s.curParts.face = randi(s.parts.face);
+        s.curParts.outfit = randi(s.parts.outfit);
     }
 
     /**
      * Set a part of the character
-     *
-     * @param part
-     * @param step
      */
-    function setPart(part: keyof typeof curSelection, step: number = 1) {
-        curSelection[part] += step;
+    function setPart(part: keyof typeof s.curParts, step: number = 1) {
+        s.curParts[part] += step;
 
-        if (curSelection[part] < 0) {
-            curSelection[part] = maxSelections[part];
+        if (s.curParts[part] < 0) {
+            s.curParts[part] = s.parts[part];
         }
-        else if (curSelection[part] > maxSelections[part]) {
-            curSelection[part] = 0;
+        else if (s.curParts[part] > s.parts[part]) {
+            s.curParts[part] = 0;
         }
     }
 
     function pressButton(b: GameObj, s: boolean) {
         let sum = b.is("left") ? -1 : 1;
-        sum = b.is("hair") ? sum * 2 : sum;
 
         if (b.is("hair")) setPart("hair", sum);
         else if (b.is("faces")) setPart("face", sum);

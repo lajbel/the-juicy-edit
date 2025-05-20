@@ -12,12 +12,18 @@ import { s } from "../shared";
  * @param enabled - Whether the checkbox is enabled or not.
  * @param onCheck - The function to call when the checkbox is checked.
  */
-export function addSpriteCheckbox(pos: Vec2, sprite: string, areaSize: Vec2, enabled: boolean, onCheck: (check: boolean) => void) {
+export function addSpriteCheckbox(
+    pos: Vec2,
+    sprite: string,
+    areaSize: Vec2,
+    enabled: boolean,
+    onCheck: (check: boolean) => void,
+) {
     const DISABLED_OPACITY = 0.5;
     const ENABLED_OPACITY = 1;
     const DISABLED_SCALE = 0.8;
     const ENABLED_SCALE = 1;
-    let activeScale = 1;
+    let activeScale = 0.8;
 
     const sprCheckbox = add([
         dynamicPos(() => pos),
