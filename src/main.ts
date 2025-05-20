@@ -1,9 +1,7 @@
-// @ts-check
-
 import { k } from "./kaplay";
-import "./loader";
 import "kaplay/global";
-import { checkbox, downloader, tlsprite, tltext } from "./components";
+import "./loader";
+import { tltext } from "./components";
 import {
     dynamicPos,
     dynamicScale,
@@ -14,10 +12,7 @@ import {
 } from "./dynamic";
 import { addSpriteCheckbox } from "./objects/addSpriteCheckbox";
 import { s } from "./shared";
-
-/**
- * @typedef {import("kaplay").Vec2} Vec2
- */
+import { AudioPlay, GameObj, Vec2 } from "kaplay";
 
 // configuration & variables
 const HAIR_COUNT = 35;
@@ -25,8 +20,7 @@ const FACES_COUNT = 40;
 const OUTFITS_COUNT = 35;
 
 // #region State
-/** @type { import("kaplay").AudioPlay } */
-let bgMusic;
+let bgMusic: AudioPlay;
 // #endregion
 
 // Cursor ///////////////////////////////////////////////////////////////////////
@@ -315,11 +309,11 @@ onKeyPressRepeat("r", randomPart);
 /**
  * Add buttons in the screen
  *
- * @param {Vec2} pos1 - The position of the left button
- * @param {Vec2} pos2 - The position of the right button
- * @param {string} thing - The thing that will be changed
+ * @param pos1 - The position of the left button
+ * @param pos2 - The position of the right button
+ * @param thing - The thing that will be changed
  */
-function addButtons(pos1, pos2, thing) {
+function addButtons(pos1: Vec2, pos2: Vec2, thing: string) {
     addButton(pos1, thing, "left");
     addButton(pos2, thing, "right");
 }
@@ -327,11 +321,11 @@ function addButtons(pos1, pos2, thing) {
 /**
  * Add a button to the screen
  *
- * @param {Vec2} pos
- * @param {string} thing
- * @param {"left" | "right"} side
+ * @param pos
+ * @param thing
+ * @param side
  */
-function addButton(pos, thing, side) {
+function addButton(pos: Vec2, thing: string, side: "left" | "right") {
     k.add([
         k.sprite("button", { flipX: side === "left" }),
         k.color(212, 110, 179),
@@ -357,10 +351,10 @@ function randomPart() {
 /**
  * Set a part of the character
  *
- * @param {keyof typeof curSelection} part
- * @param {number} step
+ * @param part
+ * @param step
  */
-function setPart(part, step = 1) {
+function setPart(part: keyof typeof curSelection, step: number = 1) {
     curSelection[part] += step;
 
     if (curSelection[part] < 0) {
@@ -371,7 +365,7 @@ function setPart(part, step = 1) {
     }
 }
 
-function pressButton(b, s) {
+function pressButton(b: GameObj, s: boolean) {
     let sum = b.is("left") ? -1 : 1;
     sum = b.is("hair") ? sum * 2 : sum;
 
