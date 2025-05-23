@@ -1,6 +1,6 @@
 import { k } from "../kaplay";
 import "kaplay/global";
-import { GameObj, Vec2 } from "kaplay";
+import type { GameObj, Vec2 } from "kaplay";
 import {
     dynamicPos,
     dynamicScale,
@@ -9,6 +9,7 @@ import {
     updateDynamic,
     updateVec2,
 } from "../dynamic";
+import { addBody, BODY_POS, HEAD_POS } from "../objects/addBody.ts";
 import { addSpriteCheckbox } from "../objects/addSpriteCheckbox";
 import { s } from "../shared";
 
@@ -32,111 +33,7 @@ k.scene("edit", () => {
     // #endregion
 
     // #region Body
-
-    const BODY_POS = dynamicVec2((v) => setVec2(v, k.width() / 2, k.height()));
-
-    const HEAD_POS = dynamicVec2((v) =>
-        setVec2(v, BODY_POS.x, BODY_POS.y - (43 * s.zoom))
-    );
-
-    const FACE_POS = dynamicVec2((v) =>
-        setVec2(v, BODY_POS.x, BODY_POS.y - (86 * s.zoom))
-    );
-
-    const NEKO_POS = dynamicVec2((v) => {
-        v.x = BODY_POS.x;
-        v.y = BODY_POS.y - (134 * s.zoom);
-    });
-
-    const SORBET_POS = dynamicVec2((v) => {
-        v.x = BODY_POS.x + (40 * s.zoom);
-        v.y = BODY_POS.y - (130 * s.zoom);
-    });
-
-    const FLUSH_POS = dynamicVec2((v) => {
-        v.x = BODY_POS.x;
-        v.y = BODY_POS.y - (84 * s.zoom);
-    });
-
-    const drawBody = () => {
-        if (s.enabledAccesories.sorbet) {
-            drawSprite({
-                sprite: "sorbet",
-                pos: SORBET_POS,
-                anchor: "bot",
-                scale: vec2(s.zoom),
-            });
-        }
-
-        if (s.enabledAccesories.neko) {
-            drawSprite({
-                sprite: "neko",
-                anchor: "bot",
-                pos: NEKO_POS,
-                scale: vec2(s.zoom),
-            });
-        }
-
-        if (s.curParts.hair > 0) {
-            drawSprite({
-                sprite: "hairstyles",
-                anchor: "bot",
-                pos: HEAD_POS,
-                frame: s.curParts.hair - 1,
-                scale: vec2(s.zoom),
-            });
-        }
-
-        drawSprite({
-            sprite: "body",
-            anchor: "bot",
-            pos: BODY_POS,
-            scale: vec2(s.zoom),
-        });
-
-        if (s.curParts.face > 0) {
-            drawSprite({
-                sprite: "faces",
-                anchor: "bot",
-                pos: FACE_POS,
-                frame: s.curParts.face - 1,
-                scale: vec2(s.zoom),
-            });
-        }
-
-        if (s.curParts.outfit > 0) {
-            drawSprite({
-                sprite: "outfits",
-                anchor: "bot",
-                pos: BODY_POS,
-                frame: s.curParts.outfit - 1,
-                scale: vec2(s.zoom),
-            });
-        }
-
-        if (s.enabledAccesories.flush) {
-            drawSprite({
-                sprite: "flush",
-                anchor: "bot",
-                pos: FLUSH_POS,
-                scale: vec2(s.zoom),
-            });
-        }
-
-        if (s.curParts.hair > 0) {
-            drawSprite({
-                sprite: "tophairstyles",
-                anchor: "bot",
-                pos: HEAD_POS,
-                frame: s.curParts.hair - 1,
-                scale: vec2(s.zoom),
-            });
-        }
-    };
-
-    onDraw(() => {
-        drawBody();
-    });
+    const [body, bodyBox] = addBody();
     // #endregion
 
     // #region Create Things Btns
@@ -236,8 +133,9 @@ k.scene("edit", () => {
         pressButton(b, false);
     });
 
-    // keys /////////////////////////////////////////////////////////////////////////
-    onKeyPressRepeat("r", randomPart);
+    // #region Input
+    onKeyPressRepeat("r", () => body.roll());
+    // #endregion
 
     /// functions ////////////////////////
     /**
@@ -275,14 +173,6 @@ k.scene("edit", () => {
         ]);
     }
 
-    function randomPart() {
-        s.curParts.hair =
-            Math.round((Math.random() * (s.parts.hair - 0) + 0) / 2)
-            * 2;
-        s.curParts.face = randi(s.parts.face);
-        s.curParts.outfit = randi(s.parts.outfit);
-    }
-
     /**
      * Set a part of the character
      */
@@ -307,6 +197,9 @@ k.scene("edit", () => {
 
     // #region Mobile Gesture
     let startDistance = 0;
+    let touchStartY = 0;
+    let touchStartedInside = false;
+    let rollStarted = false;
 
     function getDistance(touches) {
         const [a, b] = touches;
@@ -317,9 +210,27 @@ k.scene("edit", () => {
 
     const element = k.canvas;
 
+    function canvasToViewport(pt: Vec2) {
+        return new k.Vec2(
+            (pt.x - _k.gfx.viewport.x) * _k.gfx.width / _k.gfx.viewport.width,
+            (pt.y - _k.gfx.viewport.y) * _k.gfx.height / _k.gfx.viewport.height,
+        );
+    }
+
     element.addEventListener("touchstart", (e) => {
         if (e.touches.length === 2) {
             startDistance = getDistance(e.touches);
+        }
+        else if (e.touches.length === 1) {
+            touchStartY = e.touches[0].clientY;
+            const isInside = bodyBox.hasPoint(
+                canvasToViewport(vec2(
+                    e.touches[0].clientX,
+                    e.touches[0].clientY,
+                )),
+            );
+            rollStarted = false;
+            touchStartedInside = isInside;
         }
     });
 
@@ -328,6 +239,14 @@ k.scene("edit", () => {
             const currentDistance = getDistance(e.touches);
             const newZoom = currentDistance / startDistance;
             s.zoom = newZoom;
+        }
+        else if (e.touches.length === 1) {
+            const deltaY = e.touches[0].clientY - touchStartY;
+
+            if (touchStartedInside && deltaY > 10 && !rollStarted) {
+                body.roll();
+                rollStarted = true;
+            }
         }
     });
 
@@ -343,5 +262,6 @@ k.scene("edit", () => {
             obj.updateDynamicScale?.();
         }
     });
+
     // #endregion
 });

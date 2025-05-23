@@ -14,11 +14,16 @@ export const k = kaplay({
     touchToMouse: true,
 });
 
-k.onUpdate(() => {
-    const isLandscape = window.innerWidth > window.innerHeight;
-    const scale = isLandscape
-        ? window.innerWidth / 960
-        : window.innerHeight / 540;
+k.add([
+    stay(),
+    {
+        update() {
+            const isLandscape = window.innerWidth > window.innerHeight;
+            const scale = isLandscape
+                ? window.innerWidth / 960
+                : window.innerHeight / 540;
 
-    k._k.globalOpt.scale = scale;
-});
+            k._k.globalOpt.scale = scale;
+        },
+    },
+]);
