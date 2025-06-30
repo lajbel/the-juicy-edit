@@ -11,6 +11,7 @@ import {
 } from "../dynamic";
 import { addBody, BODY_POS, HEAD_POS } from "../objects/addBody.ts";
 import { addSpriteCheckbox } from "../objects/addSpriteCheckbox";
+import { secrets } from "../secrets.ts";
 import { s } from "../shared";
 
 k.scene("edit", () => {
@@ -249,6 +250,18 @@ k.scene("edit", () => {
             }
         }
     });
+
+    // #region Secrets
+    onKeyPress("space", () => {
+        const secretKey = `${s.curParts.hair}${
+            s.enabledAccesories.flush ? "Y" : "N"
+        }${s.curParts.face}${
+            s.enabledAccesories.neko ? "Y" : "N"
+        }${s.curParts.outfit}${s.enabledAccesories.sorbet ? "Y" : "N"}`;
+
+        secrets[secretKey]?.();
+    });
+    // #endregion
 
     // #region Lifecycle
     // TODO: Optimize this
