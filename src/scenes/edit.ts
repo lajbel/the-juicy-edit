@@ -195,7 +195,7 @@ k.scene("edit", () => {
         else if (b.is("outfits")) setPart("outfit", sum);
     }
 
-    // #region Mobile Gesture
+    // #region Gestures
     let startDistance = 0;
     let touchStartY = 0;
     let touchStartedInside = false;
