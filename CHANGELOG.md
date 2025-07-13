@@ -2,6 +2,9 @@
 
 ### Added
 
+- Added these outfits
+  - Trans Flag
+
 ### Fixed
 
 ### Removed
