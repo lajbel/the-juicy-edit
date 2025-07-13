@@ -2,7 +2,7 @@
 
 ### Added
 
-- Added these outfits
+- Added these outfits:
   - Trans Flag
 
 ### Fixed
