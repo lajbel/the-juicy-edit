@@ -3,6 +3,7 @@
 ### Added
 
 - Added these outfits:
+  - Farmer
   - Trans Flag
 
 ### Fixed
