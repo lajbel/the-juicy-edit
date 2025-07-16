@@ -10,6 +10,7 @@ import {
     updateVec2,
 } from "../dynamic";
 import { addBody, BODY_POS, HEAD_POS } from "../objects/addBody.ts";
+import { addColorPalette } from "../objects/addPaletteMenu.ts";
 import { addSpriteCheckbox } from "../objects/addSpriteCheckbox";
 import { secrets } from "../secrets.ts";
 import { s } from "../shared";
@@ -134,8 +135,46 @@ k.scene("edit", () => {
         pressButton(b, false);
     });
 
+    onScroll((delta) => {
+        if (delta.y < 0) {
+            s.zoom += 10 * dt();
+        }
+        else {
+            s.zoom -= 10 * dt();
+        }
+    });
+
+    // #region Create other stuff
+
+    // #endregion
+
     // #region Input
     onKeyPressRepeat("r", () => body.roll());
+
+    k.onKeyPress("d", () => {
+        k.setCamPos(k.getCamPos().add(k.width(), 0));
+    });
+
+    k.onKeyPress("a", () => {
+        k.setCamPos(k.getCamPos().add(-k.width(), 0));
+    });
+    // #endregion
+
+    // #region Camera Flow
+    let camX = 0;
+    let camY = 1;
+
+    k.onUpdate(() => {
+        setCamPos(center().add(width() * camX, height() * camY));
+    });
+
+    k.onKeyPress("d", () => {
+        camX += 1;
+    });
+
+    k.onKeyPress("a", () => {
+        camX -= 1;
+    });
     // #endregion
 
     /// functions ////////////////////////
@@ -199,7 +238,7 @@ k.scene("edit", () => {
     // #region Gestures
     let startDistance = 0;
     let touchStartY = 0;
-    let touchStartedInside = false;
+    let touchStartX = 0;
     let rollStarted = false;
 
     function getDistance(touches) {
@@ -211,27 +250,14 @@ k.scene("edit", () => {
 
     const element = k.canvas;
 
-    function canvasToViewport(pt: Vec2) {
-        return new k.Vec2(
-            (pt.x - _k.gfx.viewport.x) * _k.gfx.width / _k.gfx.viewport.width,
-            (pt.y - _k.gfx.viewport.y) * _k.gfx.height / _k.gfx.viewport.height,
-        );
-    }
-
     element.addEventListener("touchstart", (e) => {
         if (e.touches.length === 2) {
             startDistance = getDistance(e.touches);
         }
         else if (e.touches.length === 1) {
             touchStartY = e.touches[0].clientY;
-            const isInside = bodyBox.hasPoint(
-                canvasToViewport(vec2(
-                    e.touches[0].clientX,
-                    e.touches[0].clientY,
-                )),
-            );
+            touchStartX = e.touches[0].clientX;
             rollStarted = false;
-            touchStartedInside = isInside;
         }
     });
 
@@ -243,8 +269,11 @@ k.scene("edit", () => {
         }
         else if (e.touches.length === 1) {
             const deltaY = e.touches[0].clientY - touchStartY;
+            const deltaX = e.touches[0].clientX - touchStartX;
 
-            if (touchStartedInside && deltaY > 10 && !rollStarted) {
+            if (
+                deltaY > 30 && deltaX < 1 && !rollStarted
+            ) {
                 body.roll();
                 rollStarted = true;
             }
@@ -275,6 +304,14 @@ k.scene("edit", () => {
             obj.updateDynamicScale?.();
         }
     });
+    // #endregion
 
+    // #region
+    onUpdate(() => {
+        drawText({
+            text: debug.fps().toString(),
+            size: 10,
+        });
+    });
     // #endregion
 });

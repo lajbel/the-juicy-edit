@@ -137,14 +137,7 @@ export function addBody() {
         },
     ]);
 
-    const bodyBox = k.add([
-        k.sprite("body"),
-        k.area(),
-        k.anchor("bot"),
-        k.pos(BODY_POS.x, BODY_POS.y),
-        k.opacity(0),
-        dynamicScale(() => s.zoom),
-    ]);
+    const bodyBox = k.add([]);
 
     return [body, bodyBox] as const;
 }

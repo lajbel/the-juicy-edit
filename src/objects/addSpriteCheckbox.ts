@@ -2,6 +2,7 @@ import { Vec2 } from "kaplay";
 import { dynamicPos, dynamicScale } from "../dynamic";
 import { k } from "../kaplay";
 import { s } from "../shared";
+import { onClickAndReleaseArea } from "../utils.ts";
 
 /**
  * A sprite that is a checkbox.
@@ -40,7 +41,7 @@ export function addSpriteCheckbox(
         },
     ]);
 
-    sprCheckbox.onClick(() => {
+    onClickAndReleaseArea("left", sprCheckbox, () => {
         sprCheckbox.checked = !sprCheckbox.checked;
         if (onCheck) onCheck(sprCheckbox.checked);
         let toOpacity = sprCheckbox.checked

@@ -1,10 +1,19 @@
 import kaplay from "kaplay";
 
-const isLandscape = window.innerWidth > window.innerHeight;
-const scale = isLandscape ? window.innerWidth / 960 : window.innerHeight / 540;
+const getScale = () => {
+    const scaleX = window.innerWidth / 240;
+    let scale = scaleX;
+    let visibleHeight = window.innerHeight / scaleX;
+
+    if (visibleHeight < 400) {
+        scale = window.innerHeight / 400;
+    }
+
+    return scale;
+};
 
 export const k = kaplay({
-    scale: scale,
+    scale: getScale(),
     background: [141, 183, 255],
     debug: true,
     font: "happy",
@@ -18,11 +27,7 @@ k.add([
     stay(),
     {
         update() {
-            const isLandscape = window.innerWidth > window.innerHeight;
-            const scale = isLandscape
-                ? window.innerWidth / 960
-                : window.innerHeight / 540;
-
+            const scale = getScale();
             k._k.globalOpt.scale = scale;
         },
     },
