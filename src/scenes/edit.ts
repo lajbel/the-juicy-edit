@@ -10,13 +10,29 @@ import {
     updateVec2,
 } from "../dynamic";
 import { addBody, BODY_POS, HEAD_POS } from "../objects/addBody.ts";
-import { addColorPalette } from "../objects/addPaletteMenu.ts";
 import { addSpriteCheckbox } from "../objects/addSpriteCheckbox";
+import { addViewManager } from "../objects/addViewManager.ts";
 import { secrets } from "../secrets.ts";
 import { s } from "../shared";
 
+loadBean();
+
 k.scene("edit", () => {
     const bgMusic = play("chillaxation", { volume: 0.05, loop: true });
+
+    // #region Character edit menu
+    const CHARACTER_EDIT_POS = dynamicVec2((v) => setVec2(v, 0, 0));
+    // #endregion
+
+    // #region Packs Menu
+    const PACKS_VIEW_POS = dynamicVec2((v) => setVec2(v, k.width(), 0));
+    // #endregion
+
+    const views = [CHARACTER_EDIT_POS, PACKS_VIEW_POS];
+
+    // #region View Manager
+    addViewManager(views);
+    // #endregion
 
     // #region Logo
     const LOGO_POS = dynamicVec2((v) => setVec2(v, k.width() / 2, 20));
@@ -150,31 +166,6 @@ k.scene("edit", () => {
 
     // #region Input
     onKeyPressRepeat("r", () => body.roll());
-
-    k.onKeyPress("d", () => {
-        k.setCamPos(k.getCamPos().add(k.width(), 0));
-    });
-
-    k.onKeyPress("a", () => {
-        k.setCamPos(k.getCamPos().add(-k.width(), 0));
-    });
-    // #endregion
-
-    // #region Camera Flow
-    let camX = 0;
-    let camY = 1;
-
-    k.onUpdate(() => {
-        setCamPos(center().add(width() * camX, height() * camY));
-    });
-
-    k.onKeyPress("d", () => {
-        camX += 1;
-    });
-
-    k.onKeyPress("a", () => {
-        camX -= 1;
-    });
     // #endregion
 
     /// functions ////////////////////////

@@ -13,7 +13,6 @@ export const onClickAndReleaseArea = (
     });
 
     const release = onMouseRelease(btn, () => {
-        console.log(clicked);
         if (clicked) {
             clicked = false;
             if (area.isHovering()) {

@@ -21,7 +21,7 @@ importers:
         specifier: ^0.15.10
         version: 0.15.18
       kaplay:
-        specifier: github:kaplayjs/kaplay
+        specifier: github:kaplayjs/kaplay#732a75d435b632d8d13a0afd757bcac08e7c9106
         version: https://codeload.github.com/kaplayjs/kaplay/tar.gz/732a75d435b632d8d13a0afd757bcac08e7c9106
 
 packages:
