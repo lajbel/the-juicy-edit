@@ -10,11 +10,15 @@ import {
     updateVec2,
 } from "../dynamic";
 import { addBody, BODY_POS, HEAD_POS } from "../objects/addBody.ts";
-import { addPartsManager } from "../objects/addPartsManager.ts";
+import {
+    addPartsManager,
+    updateEnabledParts,
+} from "../objects/addPartsManager.ts";
 import { addSpriteCheckbox } from "../objects/addSpriteCheckbox";
 import { addViewManager } from "../objects/addViewManager.ts";
 import { secrets } from "../secrets.ts";
 import { s } from "../shared";
+import { onClickAndReleaseArea } from "../utils.ts";
 
 loadBean();
 
@@ -26,10 +30,57 @@ k.scene("edit", () => {
     // #endregion
 
     // #region Packs Menu
-    const PACKS_VIEW_POS = dynamicVec2((v) => setVec2(v, k.width(), 0));
+    const COLLECTIONS_VIEW_MENU = dynamicVec2((v) => setVec2(v, k.width(), 0));
+
+    const collectionsView = add([
+        dynamicPos(() => COLLECTIONS_VIEW_MENU),
+    ]);
+
+    for (const col in s.enabledCollections) {
+        let curScale = 1;
+        let curOpacity = 1;
+
+        const colButton = collectionsView.add([
+            sprite(`${col}_potrait`),
+            pos(0, height() / 2),
+            anchor("left"),
+            area(),
+            opacity(curScale),
+            scale(curOpacity),
+            {
+                updateState() {
+                    let toScale = 1;
+                    let toOpacity = 1;
+
+                    if (!s.enabledCollections[col]) {
+                        toScale = 0.9;
+                        toOpacity = 0.8;
+                    }
+
+                    k.tween(curScale, toScale, 0.1, (v) => {
+                        curScale = v;
+                        colButton.scale.x = v;
+                        colButton.scale.y = v;
+                    });
+
+                    k.tween(curOpacity, toOpacity, 0.1, (v) => {
+                        curOpacity = v;
+                        colButton.opacity = v;
+                    });
+                },
+            },
+        ]);
+
+        onClickAndReleaseArea("left", colButton, () => {
+            s.enabledCollections[col] = !s.enabledCollections[col];
+            colButton.updateState();
+            updateEnabledParts();
+        });
+    }
+
     // #endregion
 
-    const views = [CHARACTER_EDIT_POS, PACKS_VIEW_POS];
+    const views = [CHARACTER_EDIT_POS, COLLECTIONS_VIEW_MENU];
 
     addViewManager(views);
     addPartsManager();

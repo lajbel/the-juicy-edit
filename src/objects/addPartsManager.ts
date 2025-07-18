@@ -73,7 +73,7 @@ function previousPart(partKind: PartKind) {
     }
 }
 
-function updateEnabledParts() {
+export function updateEnabledParts() {
     s.curParts.face = undefined;
     s.curParts.hair = undefined;
     s.curParts.outfit = undefined;

@@ -56,6 +56,11 @@ export function loadCollection(
 
     return k.load(
         new Promise((resolve, reject) => {
+            k.loadSprite(
+                `${name}_potrait`,
+                `./sprites/collections/${name}/potrait.png`,
+            );
+
             k.loadAseprite(
                 `${name}_hairstyles`,
                 `./sprites/collections/${name}/hairstyles/hairstyles.png`,
