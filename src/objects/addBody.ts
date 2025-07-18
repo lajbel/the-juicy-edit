@@ -30,30 +30,30 @@ const FLUSH_POS = dynamicVec2((v) => {
 });
 
 export const drawBody = () => {
-    if (s.enabledAccesories.sorbet) {
-        drawSprite({
-            sprite: "sorbet",
-            pos: SORBET_POS,
-            anchor: "bot",
-            scale: vec2(s.zoom),
-        });
-    }
+    // if (s.enabledAccesories.sorbet) {
+    //     drawSprite({
+    //         sprite: "sorbet",
+    //         pos: SORBET_POS,
+    //         anchor: "bot",
+    //         scale: vec2(s.zoom),
+    //     });
+    // }
 
-    if (s.enabledAccesories.neko) {
-        drawSprite({
-            sprite: "neko",
-            anchor: "bot",
-            pos: NEKO_POS,
-            scale: vec2(s.zoom),
-        });
-    }
+    // if (s.enabledAccesories.neko) {
+    //     drawSprite({
+    //         sprite: "neko",
+    //         anchor: "bot",
+    //         pos: NEKO_POS,
+    //         scale: vec2(s.zoom),
+    //     });
+    // }
 
-    if (s.curParts.hair > 0) {
+    if (s.curParts.hair) {
         drawSprite({
-            sprite: "hairstyles",
+            sprite: s.curParts.hair.bottomSpritesheet,
             anchor: "bot",
             pos: HEAD_POS,
-            frame: s.curParts.hair - 1,
+            frame: s.curParts.hair.frame,
             scale: vec2(s.zoom),
         });
     }
@@ -65,41 +65,41 @@ export const drawBody = () => {
         scale: vec2(s.zoom),
     });
 
-    if (s.curParts.face > 0) {
+    if (s.curParts.face) {
         drawSprite({
-            sprite: "faces",
+            sprite: s.curParts.face.spritesheet,
             anchor: "bot",
             pos: FACE_POS,
-            frame: s.curParts.face - 1,
+            frame: s.curParts.face.frame,
             scale: vec2(s.zoom),
         });
     }
 
-    if (s.curParts.outfit > 0) {
+    if (s.curParts.outfit) {
         drawSprite({
-            sprite: "outfits",
+            sprite: s.curParts.outfit.spritesheet,
             anchor: "bot",
             pos: BODY_POS,
-            frame: s.curParts.outfit - 1,
+            frame: s.curParts.outfit.frame,
             scale: vec2(s.zoom),
         });
     }
 
-    if (s.enabledAccesories.flush) {
-        drawSprite({
-            sprite: "flush",
-            anchor: "bot",
-            pos: FLUSH_POS,
-            scale: vec2(s.zoom),
-        });
-    }
+    // if (s.enabledAccesories.flush) {
+    //     drawSprite({
+    //         sprite: "flush",
+    //         anchor: "bot",
+    //         pos: FLUSH_POS,
+    //         scale: vec2(s.zoom),
+    //     });
+    // }
 
-    if (s.curParts.hair > 0) {
+    if (s.curParts.hair) {
         drawSprite({
-            sprite: "tophairstyles",
+            sprite: s.curParts.hair.topSpritesheet,
             anchor: "bot",
             pos: HEAD_POS,
-            frame: s.curParts.hair - 1,
+            frame: s.curParts.hair.frame,
             scale: vec2(s.zoom),
         });
     }
@@ -122,11 +122,7 @@ export function addBody() {
                     this.pos.y = v;
                 }, k.easings.easeInOutQuad);
 
-                s.curParts.hair =
-                    Math.round((Math.random() * (s.parts.hair - 0) + 0) / 2)
-                    * 2;
-                s.curParts.face = randi(s.parts.face);
-                s.curParts.outfit = randi(s.parts.outfit);
+                debug.log("reimplement log");
 
                 tween(160, 0, 0.1, (v) => {
                     this.pos.y = v;

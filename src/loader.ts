@@ -1,5 +1,6 @@
 import { k } from "./kaplay";
 import { s } from "./shared.ts";
+import { loadCollection } from "./utils.ts";
 
 const EN_CHARS =
     " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890Ññ,.?!+-=_:;/\\¿¡@#'&*<>[]{}()$%€~`|";
@@ -30,40 +31,11 @@ k.loadSprite("accessory_flush", "./sprites/accesories/accesories2.png");
 k.loadSprite("accessory_neko", "./sprites/accesories/accesories3.png");
 k.loadSprite("accessory_sorbet", "./sprites/accesories/accesories1.png");
 
+// #region Collections
+loadCollection("classic");
+// #endregion
+
 k.loadSprite("en_title", "./sprites/title.png");
-
-k.loadAseprite(
-    "hairstyles",
-    "./sprites/hairstyles/hairstyles.png",
-    "./sprites/hairstyles/hairstyles.json",
-).onLoad(d => {
-    s.parts.hair = d.frames.length - 1;
-});
-
-k.loadAseprite(
-    "tophairstyles",
-    "./sprites/hairstyles/tophairstyles.png",
-    "./sprites/hairstyles/tophairstyles.json",
-).onLoad(d => {
-    s.parts.hair = d.frames.length - 1;
-});
-
-k.loadAseprite(
-    "faces",
-    "./sprites/faces/faces.png",
-    "./sprites/faces/faces.json",
-).onLoad(d => {
-    s.parts.face = d.frames.length - 1;
-});
-
-k.loadAseprite(
-    "outfits",
-    "./sprites/outfits/outfits.png",
-    "./sprites/outfits/outfits.json",
-).onLoad(d => {
-    s.parts.outfit = d.frames.length - 1;
-});
-
 k.loadSound("chillaxation", "./sounds/chillaxation.mp3");
 
 k.loadBitmapFont("juiceisntbelow", "./sprites/thejuiceisntbelow.png", 26, 37, {

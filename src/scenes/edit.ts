@@ -10,6 +10,7 @@ import {
     updateVec2,
 } from "../dynamic";
 import { addBody, BODY_POS, HEAD_POS } from "../objects/addBody.ts";
+import { addPartsManager } from "../objects/addPartsManager.ts";
 import { addSpriteCheckbox } from "../objects/addSpriteCheckbox";
 import { addViewManager } from "../objects/addViewManager.ts";
 import { secrets } from "../secrets.ts";
@@ -30,9 +31,8 @@ k.scene("edit", () => {
 
     const views = [CHARACTER_EDIT_POS, PACKS_VIEW_POS];
 
-    // #region View Manager
     addViewManager(views);
-    // #endregion
+    addPartsManager();
 
     // #region Logo
     const LOGO_POS = dynamicVec2((v) => setVec2(v, k.width() / 2, 20));
@@ -52,31 +52,6 @@ k.scene("edit", () => {
 
     // #region Body
     const [body, bodyBox] = addBody();
-    // #endregion
-
-    // #region Create Things Btns
-    const HAIR_BTN_L_POS = dynamicVec2((v) =>
-        setVec2(v, BODY_POS.x - (85 * s.zoom), BODY_POS.y - (160 * s.zoom))
-    );
-    const HAIR_BTN_R_POS = dynamicVec2((v) =>
-        setVec2(v, BODY_POS.x + (85 * s.zoom), BODY_POS.y - (160 * s.zoom))
-    );
-    const FACE_BTN_L_POS = dynamicVec2((v) =>
-        setVec2(v, BODY_POS.x - (65 * s.zoom), BODY_POS.y - (110 * s.zoom))
-    );
-    const FACE_BTN_R_POS = dynamicVec2((v) =>
-        setVec2(v, BODY_POS.x + (65 * s.zoom), BODY_POS.y - (110 * s.zoom))
-    );
-    const DRESS_BTN_L_POS = dynamicVec2((v) =>
-        setVec2(v, BODY_POS.x - (70 * s.zoom), BODY_POS.y - (28 * s.zoom))
-    );
-    const DRESS_BTN_R_POS = dynamicVec2((v) =>
-        setVec2(v, BODY_POS.x + (70 * s.zoom), BODY_POS.y - (28 * s.zoom))
-    );
-
-    addButtons(HAIR_BTN_L_POS, HAIR_BTN_R_POS, "hair");
-    addButtons(FACE_BTN_L_POS, FACE_BTN_R_POS, "faces");
-    addButtons(DRESS_BTN_L_POS, DRESS_BTN_R_POS, "outfits");
     // #endregion
 
     // #region Create Accs Btns
@@ -102,54 +77,7 @@ k.scene("edit", () => {
     );
 
     const SPRITE_CHECKBOX_SIZE = vec2(50, 50);
-
-    addSpriteCheckbox(
-        POS_FLUSH_BTN,
-        "accessory_flush",
-        SPRITE_CHECKBOX_SIZE,
-        false,
-        (check) => {
-            s.enabledAccesories.flush = check;
-        },
-    );
-
-    addSpriteCheckbox(
-        POS_NEKO_BTN,
-        "accessory_neko",
-        SPRITE_CHECKBOX_SIZE,
-        false,
-        (check) => {
-            s.enabledAccesories.neko = check;
-        },
-    );
-
-    addSpriteCheckbox(
-        SORBET_BTN_POS,
-        "accessory_sorbet",
-        SPRITE_CHECKBOX_SIZE,
-        false,
-        (check) => {
-            s.enabledAccesories.sorbet = check;
-        },
-    );
     // #endregion
-
-    /// Some events
-    onHover("btn", (btn) => {
-        btn.color = rgb(135, 62, 132);
-    });
-
-    onHoverEnd("btn", (btn) => {
-        btn.color = rgb(212, 110, 179);
-    });
-
-    onClick("left", (b) => {
-        pressButton(b, true);
-    });
-
-    onClick("right", (b) => {
-        pressButton(b, false);
-    });
 
     onScroll((delta) => {
         if (delta.y < 0) {
@@ -167,64 +95,6 @@ k.scene("edit", () => {
     // #region Input
     onKeyPressRepeat("r", () => body.roll());
     // #endregion
-
-    /// functions ////////////////////////
-    /**
-     * Add buttons in the screen
-     *
-     * @param pos1 - The position of the left button
-     * @param pos2 - The position of the right button
-     * @param thing - The thing that will be changed
-     */
-    function addButtons(pos1: Vec2, pos2: Vec2, thing: string) {
-        addButton(pos1, thing, "left");
-        addButton(pos2, thing, "right");
-    }
-
-    /**
-     * Add a button to the screen
-     *
-     * @param pos
-     * @param thing
-     * @param side
-     */
-    function addButton(pos: Vec2, thing: string, side: "left" | "right") {
-        k.add([
-            k.sprite("button", { flipX: side === "left" }),
-            k.color(212, 110, 179),
-            dynamicPos(() => pos),
-            dynamicScale(() => s.zoom),
-            k.anchor("center"),
-            k.area(),
-            k.z(10),
-            "btn",
-            "gui",
-            thing,
-            side,
-        ]);
-    }
-
-    /**
-     * Set a part of the character
-     */
-    function setPart(part: keyof typeof s.curParts, step: number = 1) {
-        s.curParts[part] += step;
-
-        if (s.curParts[part] < 0) {
-            s.curParts[part] = s.parts[part];
-        }
-        else if (s.curParts[part] > s.parts[part]) {
-            s.curParts[part] = 0;
-        }
-    }
-
-    function pressButton(b: GameObj, s: boolean) {
-        let sum = b.is("left") ? -1 : 1;
-
-        if (b.is("hair")) setPart("hair", sum);
-        else if (b.is("faces")) setPart("face", sum);
-        else if (b.is("outfits")) setPart("outfit", sum);
-    }
 
     // #region Gestures
     let startDistance = 0;
@@ -271,18 +141,6 @@ k.scene("edit", () => {
         }
     });
 
-    // #region Secrets
-    onKeyPress("space", () => {
-        const secretKey = `${s.curParts.hair}${
-            s.enabledAccesories.flush ? "Y" : "N"
-        }${s.curParts.face}${
-            s.enabledAccesories.neko ? "Y" : "N"
-        }${s.curParts.outfit}${s.enabledAccesories.sorbet ? "Y" : "N"}`;
-
-        secrets[secretKey]?.();
-    });
-    // #endregion
-
     // #region Lifecycle
     // TODO: Optimize this
     onUpdate(() => {
@@ -302,6 +160,7 @@ k.scene("edit", () => {
         drawText({
             text: debug.fps().toString(),
             size: 10,
+            fixed: true,
         });
     });
     // #endregion

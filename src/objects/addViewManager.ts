@@ -3,6 +3,12 @@ import { k } from "../kaplay.ts";
 
 const TWEEN_CAMERA_TIME = 1;
 
+/**
+ * Add a navigation with views where you can move horizontally between
+ * them.
+ *
+ * @param views The views.
+ */
 export function addViewManager(views: Vec2[]) {
     let curCamPos = vec2(0);
     let curView = 0;
