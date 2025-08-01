@@ -1,7 +1,8 @@
 import type { TimerController, Vec2 } from "kaplay";
-import { k } from "../kaplay.ts";
+import { gesture, k } from "../kaplay.ts";
 
-const TWEEN_CAMERA_TIME = 1;
+const TWEEN_CAMERA_TIME = 0.5;
+const EASING = k.easings.easeInOutQuad;
 
 /**
  * Add a navigation with views where you can move horizontally between
@@ -28,10 +29,10 @@ export function addViewManager(views: Vec2[]) {
         curTimers.push(
             k.tween(curCamPos.x, v.x, TWEEN_CAMERA_TIME, (v) => {
                 curCamPos.x = v;
-            }, k.easings.easeOutBounce),
+            }, EASING),
             k.tween(curCamPos.y, v.y, TWEEN_CAMERA_TIME, (v) => {
                 curCamPos.y = v;
-            }, k.easings.easeOutBounce),
+            }, EASING),
             k.wait(TWEEN_CAMERA_TIME, () => {
                 curTimers = [];
             }),
@@ -46,15 +47,31 @@ export function addViewManager(views: Vec2[]) {
         curCamPos = views[curView];
     });
 
-    k.onKeyPress("d", () => {
+    const nextView = () => {
         curView = (curView + 1) % views.length;
         const view = views[curView];
         tweenCamPosTo(view);
-    });
+    };
 
-    k.onKeyPress("a", () => {
+    const prevView = () => {
         curView = (curView - 1 + views.length) % views.length;
         const view = views[curView];
         tweenCamPosTo(view);
+    };
+
+    k.onKeyPress("d", () => {
+        nextView();
+    });
+
+    k.onKeyPress("a", () => {
+        prevView();
+    });
+
+    gesture.on("swipeleft", () => {
+        nextView();
+    });
+
+    gesture.on("swiperight", () => {
+        prevView();
     });
 }

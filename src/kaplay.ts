@@ -1,4 +1,5 @@
 import kaplay from "kaplay";
+import TinyGesture from "tinygesture";
 
 const getScale = () => {
     const scaleX = window.innerWidth / 240;
@@ -22,6 +23,9 @@ export const k = kaplay({
     texFilter: "nearest",
     touchToMouse: true,
 });
+
+// Create gesture handler for the canvas
+export const gesture = new TinyGesture(k.canvas);
 
 k.add([
     stay(),

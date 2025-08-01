@@ -23,6 +23,9 @@ importers:
       kaplay:
         specifier: github:kaplayjs/kaplay#732a75d435b632d8d13a0afd757bcac08e7c9106
         version: https://codeload.github.com/kaplayjs/kaplay/tar.gz/732a75d435b632d8d13a0afd757bcac08e7c9106
+      tinygesture:
+        specifier: ^3.0.0
+        version: 3.0.0
 
 packages:
 
@@ -277,6 +280,9 @@ packages:
     version: 4000.0.0-alpha.20
     engines: {node: '>=20.0.0'}
 
+  tinygesture@3.0.0:
+    resolution: {integrity: sha512-UawUggtPCHy+N65ULpR/i6VLH8AzB7jWVvTNoXRFTJNh+ub6lP/SJCxzV/Ua7sJbCt9U9I79wKkKk3wbjcLdbQ==}
+
 snapshots:
 
   '@dprint/darwin-arm64@0.49.1':
@@ -458,3 +464,5 @@ snapshots:
       esbuild-windows-arm64: 0.15.18
 
   kaplay@https://codeload.github.com/kaplayjs/kaplay/tar.gz/732a75d435b632d8d13a0afd757bcac08e7c9106: {}
+
+  tinygesture@3.0.0: {}

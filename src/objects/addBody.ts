@@ -122,8 +122,6 @@ export function addBody() {
                     this.pos.y = v;
                 }, k.easings.easeInOutQuad);
 
-                debug.log("reimplement log");
-
                 tween(160, 0, 0.1, (v) => {
                     this.pos.y = v;
                 }, k.easings.easeInOutQuad);
