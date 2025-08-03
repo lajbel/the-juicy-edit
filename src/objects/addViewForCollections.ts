@@ -1,7 +1,7 @@
 import { dynamicPos, dynamicVec2, setVec2 } from "../dynamic.ts";
 import { k } from "../kaplay.ts";
 import { s } from "../shared.ts";
-import { onClickAndReleaseArea } from "../utils.ts";
+import { onClickAndReleaseArea } from "../utils/onClickAndReleaseArea.ts";
 import { updateEnabledParts } from "./addPartsManager.ts";
 import { view } from "./addViewManager.ts";
 

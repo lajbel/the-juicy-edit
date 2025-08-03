@@ -1,6 +1,5 @@
 import { k } from "./kaplay";
-import { s } from "./shared.ts";
-import { loadCollection } from "./utils.ts";
+import { loadCollection } from "./utils/loadCollection.ts";
 
 const EN_CHARS =
     " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890Ññ,.?!+-=_:;/\\¿¡@#'&*<>[]{}()$%€~`|";

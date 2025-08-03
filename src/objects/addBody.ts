@@ -2,7 +2,7 @@ import type { GameObj } from "kaplay";
 import { dynamicScale, dynamicVec2, setVec2 } from "../dynamic.ts";
 import { k } from "../kaplay.ts";
 import { s } from "../shared.ts";
-import { parent } from "../utils.ts";
+import { parent } from "../utils/parentComp.ts";
 
 export const BODY_POS = dynamicVec2((v) =>
     setVec2(v, k.width() / 2, k.height())

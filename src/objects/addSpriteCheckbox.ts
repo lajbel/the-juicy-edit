@@ -2,7 +2,7 @@ import { Vec2 } from "kaplay";
 import { dynamicPos, dynamicScale } from "../dynamic";
 import { k } from "../kaplay";
 import { s } from "../shared";
-import { onClickAndReleaseArea } from "../utils.ts";
+import { onClickAndReleaseArea } from "../utils/onClickAndReleaseArea.ts";
 
 /**
  * A sprite that is a checkbox.

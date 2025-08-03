@@ -1,8 +1,4 @@
-import { Vec2 } from "kaplay";
-import { dynamicPos, dynamicScale } from "../dynamic";
 import { k } from "../kaplay";
-import { s } from "../shared";
-import { onClickAndReleaseArea } from "../utils.ts";
 
 const PADDING = 10;
 

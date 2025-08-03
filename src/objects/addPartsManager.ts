@@ -3,7 +3,8 @@ import { dynamicPos, dynamicScale, dynamicVec2, setVec2 } from "../dynamic.ts";
 import { k } from "../kaplay.ts";
 import { s } from "../shared.ts";
 import type { PartKind } from "../types.ts";
-import { onClickAndReleaseArea, parent } from "../utils.ts";
+import { onClickAndReleaseArea } from "../utils/onClickAndReleaseArea.ts";
+import { parent } from "../utils/parentComp.ts";
 import { BODY_POS } from "./addBody.ts";
 
 export function addPartsManager(p?: GameObj) {

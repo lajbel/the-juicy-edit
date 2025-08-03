@@ -1,7 +1,8 @@
 import { dynamicVec2, setVec2 } from "../dynamic.ts";
 import { k } from "../kaplay.ts";
 import { s } from "../shared.ts";
-import { addHandlerToObj, onGesture } from "../utils.ts";
+import { addHandlerToObj } from "../utils/addHandlerToObj.ts";
+import { onGesture } from "../utils/onGesture.ts";
 import { addBody } from "./addBody.ts";
 import { addPartsManager } from "./addPartsManager.ts";
 import { view } from "./addViewManager.ts";
