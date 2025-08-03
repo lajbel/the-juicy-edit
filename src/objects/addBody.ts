@@ -1,6 +1,8 @@
+import type { GameObj } from "kaplay";
 import { dynamicScale, dynamicVec2, setVec2 } from "../dynamic.ts";
 import { k } from "../kaplay.ts";
 import { s } from "../shared.ts";
+import { parent } from "../utils.ts";
 
 export const BODY_POS = dynamicVec2((v) =>
     setVec2(v, k.width() / 2, k.height())
@@ -49,39 +51,39 @@ export const drawBody = () => {
     // }
 
     if (s.curParts.hair) {
-        drawSprite({
+        k.drawSprite({
             sprite: s.curParts.hair.bottomSpritesheet,
             anchor: "bot",
             pos: HEAD_POS,
             frame: s.curParts.hair.frame,
-            scale: vec2(s.zoom),
+            scale: k.vec2(s.zoom),
         });
     }
 
-    drawSprite({
+    k.drawSprite({
         sprite: "body",
         anchor: "bot",
         pos: BODY_POS,
-        scale: vec2(s.zoom),
+        scale: k.vec2(s.zoom),
     });
 
     if (s.curParts.face) {
-        drawSprite({
+        k.drawSprite({
             sprite: s.curParts.face.spritesheet,
             anchor: "bot",
             pos: FACE_POS,
             frame: s.curParts.face.frame,
-            scale: vec2(s.zoom),
+            scale: k.vec2(s.zoom),
         });
     }
 
     if (s.curParts.outfit) {
-        drawSprite({
+        k.drawSprite({
             sprite: s.curParts.outfit.spritesheet,
             anchor: "bot",
             pos: BODY_POS,
             frame: s.curParts.outfit.frame,
-            scale: vec2(s.zoom),
+            scale: k.vec2(s.zoom),
         });
     }
 
@@ -95,21 +97,22 @@ export const drawBody = () => {
     // }
 
     if (s.curParts.hair) {
-        drawSprite({
+        k.drawSprite({
             sprite: s.curParts.hair.topSpritesheet,
             anchor: "bot",
             pos: HEAD_POS,
             frame: s.curParts.hair.frame,
-            scale: vec2(s.zoom),
+            scale: k.vec2(s.zoom),
         });
     }
 };
 
-export function addBody() {
+export function addBody(p?: GameObj) {
     let tweening = false;
 
-    const body = add([
-        pos(0, 0),
+    const body = k.add([
+        parent(p),
+        k.pos(0, 0),
         {
             draw() {
                 drawBody();
@@ -118,11 +121,11 @@ export function addBody() {
                 if (tweening) return;
                 tweening = true;
 
-                await tween(0, 160, 0.1, (v) => {
+                await k.tween(0, 160, 0.1, (v) => {
                     this.pos.y = v;
                 }, k.easings.easeInOutQuad);
 
-                tween(160, 0, 0.1, (v) => {
+                k.tween(160, 0, 0.1, (v) => {
                     this.pos.y = v;
                 }, k.easings.easeInOutQuad);
 
@@ -131,7 +134,5 @@ export function addBody() {
         },
     ]);
 
-    const bodyBox = k.add([]);
-
-    return [body, bodyBox] as const;
+    return body;
 }

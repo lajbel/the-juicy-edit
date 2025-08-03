@@ -1,17 +1,22 @@
-import type { TimerController, Vec2 } from "kaplay";
+import type { GameObj, PosComp, TimerController, Vec2 } from "kaplay";
 import { gesture, k } from "../kaplay.ts";
 
 const TWEEN_CAMERA_TIME = 0.5;
 const EASING = k.easings.easeInOutQuad;
 
+type ViewObj = GameObj<ViewComp | PosComp>;
+
+let views: ViewObj[] = [];
+let viewPositions: Vec2[] = [];
+
 /**
  * Add a navigation with views where you can move horizontally between
  * them.
  *
- * @param views The views.
+ * @param viewPositions The views.
  */
-export function addViewManager(views: Vec2[]) {
-    let curCamPos = vec2(0);
+export function addViewManager() {
+    let curCamPos = k.vec2(0);
     let curView = 0;
     let curTimers: TimerController[] = [];
 
@@ -40,23 +45,25 @@ export function addViewManager(views: Vec2[]) {
     };
 
     k.onUpdate(() => {
-        setCamPos(center().add(curCamPos));
+        k.setCamPos(k.center().add(curCamPos));
     });
 
     k.onResize(() => {
-        curCamPos = views[curView];
+        curCamPos = viewPositions[curView];
     });
 
     const nextView = () => {
-        curView = (curView + 1) % views.length;
-        const view = views[curView];
-        tweenCamPosTo(view);
+        views[curView].paused = true;
+        curView = (curView + 1) % viewPositions.length;
+        views[curView].paused = false;
+        tweenCamPosTo(viewPositions[curView]);
     };
 
     const prevView = () => {
-        curView = (curView - 1 + views.length) % views.length;
-        const view = views[curView];
-        tweenCamPosTo(view);
+        views[curView].paused = true;
+        curView = (curView - 1 + viewPositions.length) % viewPositions.length;
+        views[curView].paused = false;
+        tweenCamPosTo(viewPositions[curView]);
     };
 
     k.onKeyPress("d", () => {
@@ -75,3 +82,19 @@ export function addViewManager(views: Vec2[]) {
         prevView();
     });
 }
+
+interface ViewComp {
+}
+
+/**
+ * Register a game object as a view.
+ */
+export const view = (pos: Vec2): ViewComp => {
+    return {
+        id: "view",
+        add() {
+            viewPositions.push(pos);
+            views.push(this);
+        },
+    };
+};

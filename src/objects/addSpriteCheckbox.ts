@@ -26,7 +26,7 @@ export function addSpriteCheckbox(
     const ENABLED_SCALE = 1;
     let activeScale = 0.8;
 
-    const sprCheckbox = add([
+    const sprCheckbox = k.add([
         dynamicPos(() => pos),
         dynamicScale(() => s.zoom * activeScale),
         k.sprite(sprite),

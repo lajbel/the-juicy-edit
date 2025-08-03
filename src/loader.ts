@@ -33,6 +33,7 @@ k.loadSprite("accessory_sorbet", "./sprites/accesories/accesories1.png");
 
 // #region Collections
 loadCollection("classic");
+loadCollection("pride");
 // #endregion
 
 k.loadSprite("en_title", "./sprites/title.png");

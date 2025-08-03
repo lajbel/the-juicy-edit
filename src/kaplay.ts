@@ -28,7 +28,7 @@ export const k = kaplay({
 export const gesture = new TinyGesture(k.canvas);
 
 k.add([
-    stay(),
+    k.stay(),
     {
         update() {
             const scale = getScale();

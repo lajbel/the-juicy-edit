@@ -1,5 +1,6 @@
 import type { AreaComp, GameObj, KEventController, MouseButton } from "kaplay";
-import { k } from "./kaplay.ts";
+import type { Events } from "tinygesture";
+import { gesture, k } from "./kaplay.ts";
 import { s } from "./shared.ts";
 
 export const onClickAndReleaseArea = (
@@ -9,11 +10,11 @@ export const onClickAndReleaseArea = (
 ) => {
     let clicked = false;
 
-    const press = onMousePress(btn, () => {
+    const press = k.onMousePress(btn, () => {
         clicked = true;
     });
 
-    const release = onMouseRelease(btn, () => {
+    const release = k.onMouseRelease(btn, () => {
         if (clicked) {
             clicked = false;
             if (area.isHovering()) {
@@ -117,7 +118,11 @@ export function loadCollection(
             ).onLoad((data) => {
                 let frame = 0;
 
-                for (let i = s.curIds.outfit; i < data.frames.length; i++) {
+                for (
+                    let i = s.curIds.outfit;
+                    i < s.curIds.outfit + data.frames.length;
+                    i++
+                ) {
                     s.collections[name].parts.outfit.push({
                         id: i,
                         kind: "outfit",
@@ -135,3 +140,42 @@ export function loadCollection(
         }),
     );
 }
+
+export const addHandlerToObj = (obj: GameObj, event: KEventController) => {
+    k.onUpdate(() => {
+        event.paused = obj.paused;
+    });
+};
+
+// TODO: Type this better
+export const onGesture = (
+    event: keyof Events,
+    handler: (...args: any[]) => void,
+): KEventController => {
+    let paused = false;
+
+    const ev = gesture.on(event, (...args) => {
+        if (!paused) handler(...args);
+    });
+
+    return {
+        cancel() {
+            ev.cancel();
+        },
+        set paused(v: boolean) {
+            paused = v;
+        },
+        get paused() {
+            return paused;
+        },
+    };
+};
+
+export const parent = (obj: GameObj = k._k.game.root) => {
+    return {
+        id: "parentcomp",
+        add() {
+            this.parent = obj;
+        },
+    };
+};

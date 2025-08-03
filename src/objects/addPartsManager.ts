@@ -1,13 +1,17 @@
-import type { Vec2 } from "kaplay";
+import type { GameObj, Vec2 } from "kaplay";
 import { dynamicPos, dynamicScale, dynamicVec2, setVec2 } from "../dynamic.ts";
 import { k } from "../kaplay.ts";
 import { s } from "../shared.ts";
 import type { PartKind } from "../types.ts";
-import { onClickAndReleaseArea } from "../utils.ts";
+import { onClickAndReleaseArea, parent } from "../utils.ts";
 import { BODY_POS } from "./addBody.ts";
 
-export function addPartsManager() {
+export function addPartsManager(p?: GameObj) {
     updateEnabledParts();
+
+    const partButtons = k.add([
+        parent(p),
+    ]);
 
     const HAIR_BTN_L_POS = dynamicVec2((v) =>
         setVec2(v, BODY_POS.x - (85 * s.zoom), BODY_POS.y - (160 * s.zoom))
@@ -29,17 +33,19 @@ export function addPartsManager() {
     );
 
     /// Some events
-    onHover("btn", (btn) => {
-        btn.color = rgb(135, 62, 132);
+    k.onHover("btn", (btn) => {
+        btn.color = k.rgb(135, 62, 132);
     });
 
-    onHoverEnd("btn", (btn) => {
-        btn.color = rgb(212, 110, 179);
+    k.onHoverEnd("btn", (btn) => {
+        btn.color = k.rgb(212, 110, 179);
     });
 
-    addButtons(HAIR_BTN_L_POS, HAIR_BTN_R_POS, "hair");
-    addButtons(FACE_BTN_L_POS, FACE_BTN_R_POS, "face");
-    addButtons(DRESS_BTN_L_POS, DRESS_BTN_R_POS, "outfit");
+    addButtons(HAIR_BTN_L_POS, HAIR_BTN_R_POS, "hair").parent = partButtons;
+    addButtons(FACE_BTN_L_POS, FACE_BTN_R_POS, "face").parent = partButtons;
+    addButtons(DRESS_BTN_L_POS, DRESS_BTN_R_POS, "outfit").parent = partButtons;
+
+    return partButtons;
 }
 
 // #region Parts Flow
@@ -87,7 +93,6 @@ export function updateEnabledParts() {
     for (let collection in s.enabledCollections) {
         if (!s.enabledCollections[collection]) continue;
         const col = s.collections[collection];
-
         s.enabledParts.face.push(...col.parts.face);
         s.enabledParts.outfit.push(...col.parts.outfit);
         s.enabledParts.hair.push(...col.parts.hair);
@@ -127,11 +132,17 @@ function addButton(pos: Vec2, part: PartKind, side: "left" | "right") {
             nextPart(part);
         }
     });
+
+    return button;
 }
 
 function addButtons(pos1: Vec2, pos2: Vec2, thing: PartKind) {
-    addButton(pos1, thing, "left");
-    addButton(pos2, thing, "right");
+    const buttons = k.add([]);
+
+    addButton(pos1, thing, "left").parent = buttons;
+    addButton(pos2, thing, "right").parent = buttons;
+
+    return buttons;
 }
 
 // #endregion

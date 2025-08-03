@@ -15,7 +15,7 @@ export function addColorPalette() {
         k.pos(PADDING, PADDING),
     ]);
 
-    onUpdate(() => {
-        container.width = width() - PADDING * 2;
+    k.onUpdate(() => {
+        container.width = k.width() - PADDING * 2;
     });
 }

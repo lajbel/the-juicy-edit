@@ -8,7 +8,7 @@ export const updateVec2: (() => Vec2)[] = [];
  * @param vec
  */
 export function dynamicVec2(vec: (v: Vec2) => void) {
-    const v = vec2();
+    const v = k.vec2();
     const update = vec.bind(null, v);
 
     updateVec2.push(update);
@@ -20,7 +20,7 @@ export function dynamicVec2(vec: (v: Vec2) => void) {
 export const updateDynamic: GameObj[] = [];
 
 interface DynamicPosComp extends Comp {
-    updateDynamicPos: () => void
+    updateDynamicPos: () => void;
 }
 
 /**
@@ -28,7 +28,7 @@ interface DynamicPosComp extends Comp {
  *
  * @param pos
  */
-export function dynamicPos(pos: () => Vec2) : DynamicPosComp {
+export function dynamicPos(pos: () => Vec2): DynamicPosComp {
     return {
         id: "dynamicPos",
         add(this: GameObj) {
@@ -42,7 +42,7 @@ export function dynamicPos(pos: () => Vec2) : DynamicPosComp {
 }
 
 interface DynamicScaleComp extends Comp {
-    updateDynamicScale: () => void
+    updateDynamicScale: () => void;
 }
 
 /**
@@ -50,7 +50,7 @@ interface DynamicScaleComp extends Comp {
  *
  * @param scale
  */
-export function dynamicScale(scale: () => number) : DynamicScaleComp {
+export function dynamicScale(scale: () => number): DynamicScaleComp {
     return {
         id: "dynamicScale",
         add(this: GameObj) {
