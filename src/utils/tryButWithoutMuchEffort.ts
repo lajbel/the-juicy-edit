@@ -1,7 +1,7 @@
-const tryButWithoutMuchEffort = (call: () => any) => {
+export const tryButWithoutMuchEffort = (call: () => any) => {
     try {
         call();
-    } catch {
+    } catch (e) {
         // No problem boy, we're not perfect!
     }
 };

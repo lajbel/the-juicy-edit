@@ -1,5 +1,6 @@
 import { k } from "../kaplay.ts";
 import { s } from "../shared.ts";
+import { tryButWithoutMuchEffort } from "./tryButWithoutMuchEffort.ts";
 
 // TODO: Implement accesories
 export function loadCollection(
@@ -49,7 +50,9 @@ export function loadCollection(
 
                     s.curIds.hair = data.frames.length;
                 });
+            });
 
+            tryButWithoutMuchEffort(() => {
                 k.loadAseprite(
                     `${name}_tophairstyles`,
                     `./sprites/collections/${name}/hairstyles/tophairstyles.png`,
@@ -76,7 +79,9 @@ export function loadCollection(
 
                     s.curIds.face = data.frames.length;
                 });
+            });
 
+            tryButWithoutMuchEffort(() => {
                 k.loadAseprite(
                     `${name}_outfits`,
                     `./sprites/collections/${name}/outfits/outfits.png`,
